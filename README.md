@@ -31,7 +31,7 @@ const buttonVariants = {
   hover: {
     TextColor3: new Color3(0, 1, 0),
   },
-  off: {
+  default: {
     TextColor3: new Color3(1, 1, 1),
   },
 };
@@ -44,7 +44,7 @@ return (
         setState("hover");
       },
       MouseLeave: () => {
-        setState("off");
+        setState("default");
       },
     }}
     variants={buttonVariants}
