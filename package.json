@@ -1,6 +1,6 @@
 {
   "name": "@firere/motion",
-  "version": "0.0.1d",
+  "version": "0.0.2",
   "author": "firere",
   "description": "Compatible with my version of Roact",
   "main": "out/init.lua",
