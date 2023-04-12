@@ -1,10 +1,10 @@
 {
-  "name": "@rbxts/motion",
+  "name": "@firere/motion",
   "version": "0.0.1d",
-  "author": "yayashn",
-  "description": "",
+  "author": "firere",
+  "description": "Compatible with my version of Roact",
   "main": "out/init.lua",
-  "repository": "https://github.com/yayashn/motion",
+  "repository": "https://github.com/Firere/motion",
   "scripts": {
     "build": "rbxtsc",
     "watch": "rbxtsc -w",
@@ -33,9 +33,10 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@firere/roact": "1.4.4-ts.0",
+    "@firere/roact-hooked": "^2.3.3",
+    "@firere/roblox-ts": "^2.1.0",
     "@rbxts/object-utils": "^1.0.4",
-    "@rbxts/roact": "1.4.4-ts.0",
-    "@rbxts/roact-hooked": "^2.3.3",
     "@rbxts/services": "^1.5.1"
   }
 }
