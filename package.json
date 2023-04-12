@@ -21,7 +21,10 @@
     "access": "public"
   },
   "devDependencies": {
+    "@firere/roblox-ts": "^2.1.0",
     "@rbxts/compiler-types": "2.0.4-types.1",
+    "@rbxts/object-utils": "^1.0.4",
+    "@rbxts/services": "^1.5.1",
     "@rbxts/types": "^1.0.675",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
@@ -32,11 +35,8 @@
     "prettier": "^2.8.7",
     "typescript": "^5.0.4"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@firere/roact": "1.4.4-ts.0",
-    "@firere/roact-hooked": "^2.3.3",
-    "@firere/roblox-ts": "^2.1.0",
-    "@rbxts/object-utils": "^1.0.4",
-    "@rbxts/services": "^1.5.1"
+    "@firere/roact-hooked": "^2.3.3"
   }
 }
