@@ -1,6 +1,6 @@
 {
   "name": "@firere/motion",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "firere",
   "description": "Compatible with my version of Roact",
   "main": "out/init.lua",
@@ -36,7 +36,7 @@
     "typescript": "^5.0.4"
   },
   "peerDependencies": {
-    "@firere/roact": "1.4.4-ts.0",
-    "@firere/roact-hooked": "^2.3.3"
+    "@firere/roact": "*",
+    "@firere/roact-hooked": "*"
   }
 }

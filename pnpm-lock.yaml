@@ -2,10 +2,10 @@ lockfileVersion: '6.0'
 
 dependencies:
   '@firere/roact':
-    specifier: 1.4.4-ts.0
+    specifier: '*'
     version: 1.4.4-ts.0
   '@firere/roact-hooked':
-    specifier: ^2.3.3
+    specifier: '*'
     version: 2.3.3(@firere/roact@1.4.4-ts.0)
 
 devDependencies:
