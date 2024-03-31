@@ -1,42 +1,42 @@
 {
-  "name": "@firere/motion",
-  "version": "0.0.3",
-  "author": "firere",
-  "description": "Compatible with my version of Roact",
-  "main": "out/init.lua",
-  "repository": "https://github.com/Firere/motion",
-  "scripts": {
-    "build": "rbxtsc",
-    "watch": "rbxtsc -w",
-    "prepublishOnly": "pnpm run build"
-  },
-  "keywords": [],
-  "license": "ISC",
-  "types": "out/index.d.ts",
-  "files": [
-    "out",
-    "!**/*.tsbuildinfo"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "devDependencies": {
-    "@firere/roblox-ts": "^2.1.0",
-    "@rbxts/compiler-types": "2.0.4-types.1",
-    "@rbxts/object-utils": "^1.0.4",
-    "@rbxts/services": "^1.5.1",
-    "@rbxts/types": "^1.0.675",
-    "@typescript-eslint/eslint-plugin": "^5.57.1",
-    "@typescript-eslint/parser": "^5.57.1",
-    "eslint": "^8.38.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-roblox-ts": "^0.0.35",
-    "prettier": "^2.8.7",
-    "typescript": "^5.0.4"
-  },
-  "peerDependencies": {
-    "@firere/roact": "*",
-    "@firere/roact-hooked": "*"
-  }
+	"name": "@firere/motion",
+	"version": "1.0.0",
+	"author": "firere",
+	"description": "Compatible with my version of Roact",
+	"main": "out/init.lua",
+	"repository": "https://github.com/Firere/motion",
+	"scripts": {
+		"build": "rbxtsc",
+		"watch": "rbxtsc -w",
+		"prepublishOnly": "pnpm run build"
+	},
+	"keywords": [],
+	"license": "ISC",
+	"types": "out/index.d.ts",
+	"files": [
+		"out",
+		"!**/*.tsbuildinfo"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"devDependencies": {
+		"@rbxts/compiler-types": "2.3.0-types.0",
+		"@rbxts/types": "^1.0.766",
+		"@typescript-eslint/eslint-plugin": "^5.57.1",
+		"@typescript-eslint/parser": "^5.57.1",
+		"eslint": "^8.38.0",
+		"eslint-config-prettier": "^8.8.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"eslint-plugin-roblox-ts": "^0.0.35",
+		"prettier": "^2.8.7",
+		"typescript": "^5.0.4"
+	},
+	"dependencies": {
+		"@rbxts/object-utils": "^1.0.4",
+		"@rbxts/react": "^0.3.4",
+		"@rbxts/react-roblox": "^0.3.4",
+		"@rbxts/react-vendor": "npm:@firere/react-vendor@^0.3.4-2",
+		"@rbxts/services": "^1.5.1"
+	}
 }

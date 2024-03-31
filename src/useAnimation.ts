@@ -1,12 +1,11 @@
-import Roact from "@firere/roact";
-import { useEffect, useState } from "@firere/roact-hooked";
+import React, { useEffect, useState } from "@rbxts/react";
 import Object from "@rbxts/object-utils";
 import { TweenService } from "@rbxts/services";
 import { AnimationTransition, AnimationVariants } from ".";
 
 export default function useAnimation<T extends Instance>(
 	variants: AnimationVariants<T>,
-	ref: Roact.Ref<T>,
+	ref: React.RefObject<T>,
 	initial?:
 		| keyof AnimationVariants<T>
 		| (Partial<T> & {
@@ -46,7 +45,7 @@ export default function useAnimation<T extends Instance>(
 		};
 	}
 	useEffect(() => {
-		const element = ref.getValue();
+		const element = ref.current;
 		if (!element) return;
 
 		Object.entries(initial ?? {}).forEach(([key, value]) => {
