@@ -5,7 +5,7 @@ import { AnimationTransition, AnimationVariants } from ".";
 
 export default function useAnimation<T extends Instance>(
 	variants: AnimationVariants<T>,
-	ref: React.RefObject<T>,
+	ref: React.Ref<T>,
 	initial?:
 		| keyof AnimationVariants<T>
 		| (Partial<T> & {
@@ -45,6 +45,7 @@ export default function useAnimation<T extends Instance>(
 		};
 	}
 	useEffect(() => {
+		if (!ref || typeIs(ref, "function")) return;
 		const element = ref.current;
 		if (!element) return;
 

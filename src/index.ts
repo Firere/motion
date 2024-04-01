@@ -18,12 +18,12 @@ export type AnimationVariants<T> = Record<
 	}
 >;
 
-export interface WithAnimationProps<T extends GuiObject & Record<string, unknown>> {
+export interface WithAnimationProps<T extends Instance> {
 	variants?: AnimationVariants<T>;
 	initial?: keyof AnimationVariants<T> | (Partial<T> & { transition?: Partial<AnimationTransition> });
 	animate?: keyof AnimationVariants<T> | (Partial<T> & { transition?: Partial<AnimationTransition> });
 	transition?: Partial<AnimationTransition>;
-	ref?: React.RefObject<T>;
+	ref?: React.Ref<T>;
 }
 
 export { motion, useAnimation };
