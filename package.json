@@ -1,6 +1,6 @@
 {
 	"name": "@firere/motion",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"author": "firere",
 	"description": "Motion for React",
 	"main": "out/init.lua",

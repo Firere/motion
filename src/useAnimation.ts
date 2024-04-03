@@ -60,7 +60,7 @@ export default function useAnimation<T extends Instance>(
 		const element = ref.current;
 		if (!element) return;
 
-		let tween!: Tween;
+		let tween: Tween | undefined;
 		if (animationVariant !== undefined) {
 			tween = TweenService.Create(
 				element,
@@ -81,7 +81,7 @@ export default function useAnimation<T extends Instance>(
 			tween.Play();
 		}
 
-		return () => tween.Destroy();
+		return () => tween?.Destroy();
 	}, [ref, variants, variantState, animate, transition]);
 
 	return [typeIs(variantState, "string") ? variantState : "", (variant: string) => setVariantState(variant)];
