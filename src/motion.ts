@@ -1,38 +1,47 @@
 import Object from "@rbxts/object-utils";
 import React from "@rbxts/react";
-import { WithAnimationProps } from ".";
+import type { ReactMotionProps } from ".";
 import useAnimation from "./useAnimation";
 
-function withAnimation<T extends Instance, K extends keyof JSX.IntrinsicElements>(elementType: K) {
-	return React.forwardRef((props: JSX.IntrinsicElements[K] & WithAnimationProps<T>, forwardedRef?: React.Ref<T>) => {
+/**
+ * Exported in case users want to use instances other than the ones exported by default.
+ * @param elementType  Instance class to convert to a motion component. Must be creatable.
+ * @returns Motion component of whatever `Instance` was passed in. You can use this just like you'd use any of the `motion.[element]` components.
+ */
+export function withAnimation<
+	K extends keyof CreatableInstances,
+	T extends CreatableInstances[K] = CreatableInstances[K],
+>(elementType: K) {
+	return React.forwardRef((props: ReactMotionProps<T>, forwardedRef?: React.Ref<T>) => {
 		const { initial, animate, transition, variants } = props;
-		const ref = forwardedRef ?? React.createRef<T>();
-		useAnimation<T>(variants ?? {}, ref, initial, animate, transition);
+		const ref = (forwardedRef as React.RefObject<T>) ?? React.createRef<T>();
+		useAnimation(ref, { animate, initial, transition, variants });
+
 		const rest = Object.fromEntries(
 			Object.entries(props).filter(
-				([key]) => !["initial", "animate", "transition", "variants", "ref"].includes(key as unknown as string),
+				([key]) => !["initial", "animate", "transition", "variants", "ref"].includes(key as string),
 			) as readonly (readonly [string | number | symbol, unknown])[],
-		) as JSX.IntrinsicElements[K];
+		) as React.InstanceProps<T>;
 
-		return React.createElement(elementType as keyof CreatableInstances, {
-			...(rest as JSX.IntrinsicElements[K]),
-			ref: ref,
+		return React.createElement(elementType, {
+			...rest,
+			ref,
 		});
 	});
 }
 
 export const motion = {
-	frame: withAnimation<Frame, "frame">("Frame" as "frame"),
-	imagelabel: withAnimation<ImageLabel, "imagelabel">("ImageLabel" as "imagelabel"),
-	imagebutton: withAnimation<ImageButton, "imagebutton">("ImageButton" as "imagebutton"),
-	scrollingframe: withAnimation<ScrollingFrame, "scrollingframe">("ScrollingFrame" as "scrollingframe"),
-	textlabel: withAnimation<TextLabel, "textlabel">("TextLabel" as "textlabel"),
-	textbox: withAnimation<TextBox, "textbox">("TextBox" as "textbox"),
-	textbutton: withAnimation<TextButton, "textbutton">("TextButton" as "textbutton"),
-	uicorner: withAnimation<UICorner, "uicorner">("UICorner" as "uicorner"),
-	uigridlayout: withAnimation<UIGridLayout, "uigridlayout">("UIGridLayout" as "uigridlayout"),
-	uilistlayout: withAnimation<UIListLayout, "uilistlayout">("UIListLayout" as "uilistlayout"),
-	uipadding: withAnimation<UIPadding, "uipadding">("UIPadding" as "uipadding"),
-	uisizeconstraint: withAnimation<UISizeConstraint, "uisizeconstraint">("UISizeConstraint" as "uisizeconstraint"),
-	uistroke: withAnimation<UIStroke, "uistroke">("UIStroke" as "uistroke"),
+	frame: withAnimation("Frame"),
+	imagelabel: withAnimation("ImageLabel"),
+	imagebutton: withAnimation("ImageButton"),
+	scrollingframe: withAnimation("ScrollingFrame"),
+	textlabel: withAnimation("TextLabel"),
+	textbox: withAnimation("TextBox"),
+	textbutton: withAnimation("TextButton"),
+	uicorner: withAnimation("UICorner"),
+	uigridlayout: withAnimation("UIGridLayout"),
+	uilistlayout: withAnimation("UIListLayout"),
+	uipadding: withAnimation("UIPadding"),
+	uisizeconstraint: withAnimation("UISizeConstraint"),
+	uistroke: withAnimation("UIStroke"),
 };

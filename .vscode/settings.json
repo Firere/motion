@@ -1,6 +1,13 @@
 {
 	"typescript.tsdk": "node_modules/typescript/lib",
 	"files.eol": "\n",
+	"[markdown]": {
+		"files.trimTrailingWhitespace": false,
+		"editor.unicodeHighlight.ambiguousCharacters": false,
+		"editor.unicodeHighlight.invisibleCharacters": false,
+		"diffEditor.ignoreTrimWhitespace": false,
+		"editor.wordWrap": "on"
+	},
 	"[typescript]": {
 		"editor.defaultFormatter": "dbaeumer.vscode-eslint",
 		"editor.formatOnSave": true
