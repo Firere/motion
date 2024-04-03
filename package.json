@@ -1,10 +1,13 @@
 {
-	"name": "@firere/motion",
+	"name": "@rbxts/react-motion",
 	"version": "1.2.1",
 	"author": "firere",
 	"description": "Motion for React",
 	"main": "out/init.lua",
-	"repository": "git+https://github.com/Firere/motion.git",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Firere/motion.git"
+	},
 	"scripts": {
 		"build": "npx rbxtsc",
 		"watch": "npx rbxtsc -w",
