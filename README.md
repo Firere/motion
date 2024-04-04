@@ -260,7 +260,7 @@ return (
 Because `useAnimation` simply takes in a ref, you can animate any React component with Motion, even if the `motion` object doesn't have it! If you still want to use the same syntax as you would with the `motion` object but with a different element, Motion also exports `withAnimation`:
 
 ```tsx
-import { withAnimation } from "@rbxts/motion";
+import { withAnimation } from "@rbxts/react-motion";
 
 const Part = withAnimation("Part"); // this is a React component with Motion props
 const part = <Part animate={} initial={} transition={} variants={} />
