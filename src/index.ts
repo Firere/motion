@@ -1,8 +1,7 @@
-import type React from "@rbxts/react";
-import { motion, withAnimation } from "./motion";
+import { createMotionComponent, motion } from "./motion";
 import useAnimation from "./useAnimation";
 
-export interface AnimationTransition {
+export interface Transition {
 	duration?: number;
 	easingStyle?: Enum.EasingStyle | (CastsToEnum<Enum.EasingStyle> & string);
 	easingDirection?: Enum.EasingDirection | (CastsToEnum<Enum.EasingDirection> & string);
@@ -11,23 +10,22 @@ export interface AnimationTransition {
 	delay?: number;
 }
 
-export type AnimationVariant<T extends Instance> = Partial<ExtractMembers<T, Tweenable>> & {
-	transition?: AnimationTransition;
+export type Target<T extends Instance> = Partial<ExtractMembers<T, Tweenable>>;
+
+export type TargetAndTransition<T extends Instance> = Target<T> & {
+	transition?: Transition;
 };
 
-export type AnimationVariants<T extends Instance> = Partial<Record<string, AnimationVariant<T>>>;
+export type Variants<T extends Instance> = Record<string, TargetAndTransition<T>>;
 
-export type Variant<T extends Instance> = keyof AnimationVariants<T> | AnimationVariant<T>;
+export type Variant<T extends Instance> = keyof Variants<T> | TargetAndTransition<T>;
 
-export interface MotionProps<T extends Instance> {
+export interface AnimationProps<T extends Instance> {
 	animate?: Variant<T>;
 	initial?: Variant<T>;
-	transition?: AnimationTransition;
-	variants?: AnimationVariants<T>;
+	transition?: Transition;
+	variants?: Variants<T>;
 }
 
-export type ReactMotionProps<T extends Instance> = React.InstanceProps<T> &
-	MotionProps<T> & { ref?: React.RefObject<T> };
-
 export default motion;
-export { useAnimation, withAnimation };
+export { createMotionComponent, useAnimation };

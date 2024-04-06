@@ -1,9 +1,9 @@
 import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
-import type { AnimationTransition, MotionProps, Variant } from ".";
+import type { AnimationProps, Transition, Variant } from ".";
 
-function getVariant<T extends Instance>(variants: MotionProps<T>["variants"], variant: string) {
+function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: string) {
 	if (variants === undefined)
 		error(`Variant "${tostring(variant)}" does not exist because no variants have been set`);
 	if (!(variant in variants)) error(`Variant "${tostring(variant)}" is invalid: ${variants}`);
@@ -17,7 +17,7 @@ const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
 
 export default function useAnimation<T extends Instance>(
 	ref: React.RefObject<T>,
-	{ animate, initial, transition, variants }: MotionProps<T>,
+	{ animate, initial, transition, variants }: AnimationProps<T>,
 ): [string, (variant: string) => void] {
 	const [variantState, setVariantState] = useState<Variant<T>>();
 	const currentVariant = typeIs(variantState, "string") ? getVariant(variants, variantState) : variantState;
@@ -41,7 +41,7 @@ export default function useAnimation<T extends Instance>(
 	}, []);
 
 	let animationProperties: Partial<ExtractMembers<T, Tweenable>> = {};
-	let mergedTransition: AnimationTransition = {};
+	let mergedTransition: Transition = {};
 
 	if (animationVariant !== undefined) {
 		animationProperties = Object.entries(animationVariant)
