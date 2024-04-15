@@ -13,7 +13,7 @@ A port of `@rbxts/motion` to React.
 
 ## Introduction
 
-Simply animate UI from point A to B with Motion, a simple yet powerful animation library for roblox-ts & React, inspired by the popular framer-motion library for React.
+Simply animate UI from point A to B with Motion, a simple yet powerful animation library for roblox-ts & React, inspired by Framer motion.
 
 ## The `motion` object
 
@@ -110,10 +110,10 @@ return (
 );
 ```
 
-Transitions can also be used in variants. If used in both variants and as a prop simultaneously, the transitions will be merged into one transition. In the case of a conflict between a variant transition and the `transition` prop, the variant transition will have priority over the `transition` prop and will overwrite it.
+Transitions can also be used in variants. If used in both variants and as a prop simultaneously, the transitions will be merged into one transition. In the case of a conflict between a variant transition and the `transition` prop, the variant transition will have priority over the `transition` prop and will override it. In other words, they *cascade*.
 
->[!NOTE]
-> This differs from the behaviour of `@rbxts/motion`, which instead prioritises the `transition` prop over variants' transition. If you're migrating from `@rbxts/motion`, make sure you account for this.
+>[!WARNING]
+>This differs from the behaviour of `@rbxts/motion`, which instead prioritises the `transition` prop over variants' transition. If you're migrating from `@rbxts/motion`, make sure you account for this.
 
 ```tsx
 const [state, setState] = useState<"hover" | "default">("default")
@@ -123,17 +123,17 @@ const buttonVariants = {
     TextColor3: new Color3(0, 1, 0),
     transition={{ 
       duration: 20,
-      easingStyle: Enum.EasingStyle.Elastic, // overwrites Quint
-      easingDirection: Enum.EasingDirection.Out,
+      easingStyle: "Elastic", // overrides Quint
+      easingDirection: "Out",
       reverses: true, // unique to the `hover` variant
     }}
   },
   default: {
     TextColor3: new Color3(1, 1, 1),
     transition={{ 
-      duration: 1, // overwrites 20
-      easingStyle: Enum.EasingStyle.Quad, // overwrites Quint
-      easingDirection: Enum.EasingDirection.In, // unique to the `default` variant
+      duration: 1, // overrides 20
+      easingStyle: "Quad", // overrides Quint
+      easingDirection: "In", // unique to the `default` variant
       repeatCount: 2, // unique to the `default` variant
     }}
   },
@@ -144,7 +144,7 @@ return (
     animate={state}
     transition={{
       duration: 20,
-      easingStyle: Enum.EasingStyle.Quint,
+      easingStyle: "Quint",
       delay: 0.5, // gets added to all variants
     }}
     Event={{
@@ -155,6 +155,45 @@ return (
   />
 );
 ```
+
+Earlier, I mentioned variants were like CSS classes. This is also true in that you can specify multiple variants by passing them in using an array. If a conflict between variants emerges, then the variant specified later in the array (i.e. the one with a higher index) will override any variants before it.
+
+This is useful for components which have multiple pieces of state that each need their own styles to animate to, like a button which can be selected:
+
+```tsx
+function SelectButton() {
+  const [state, setState] = useState<"hover" | "default">("default");
+  const [selected, setSelected] = useState(false);
+  const selectionStatus = useMemo(() => selected ? "selected" : "unselected", [selected]);
+
+  return (
+    <motion.textbutton
+      animate={[state, selectionStatus]}
+      Event={{
+        Activated: () => setSelected((selected) => !selected),
+        MouseEnter: () => setState("hover"),
+        MouseLeave: () => setState("default"),
+      }}
+      variants={{ 
+        hover: {
+          // props here
+        },
+        default: {
+          // props here
+        },
+        selected: {
+          // props here, will override `hover` and `default`
+        },
+        unselected: {
+          // props here, will override `hover` and `default`
+        },
+      }}
+    />
+  );
+}
+```
+
+You could even go further and have components which accept passing down `animate` props and automatically merging them, like a `Button` which implemented the hovering animation and a `SelectButton` that implemented the `selected`-`unselected` variants and passed those down to `Button`.
 
 ## Copy & paste example using `motion` object (works with Hoarcekat)
 
@@ -176,7 +215,7 @@ const variants = {
   }
 };
 
-const Button = () => {
+function Button() {
   const [state, setState] = useState<"on" | "off">("off");
 
   return (
@@ -218,11 +257,12 @@ export = (target: Instance) => {
 
 ## useAnimation
 
-That's not all Motion has to offer, though! If you'd like, you can use the `useAnimation` hook provided by Motion. This allows you to animate any component in your codebase without having to use the `motion` object or the `animate` prop, as it returns a setter for the variant:
+That's not all Motion has to offer, though! If you'd like, you can use the `useAnimation` hook provided by motion. This allows you to animate any component in your codebase without having to use `motion` or the `animate` prop, as it returns a setter for the variant:
 
 ```tsx
 const ref = useRef<Frame>();
 const [variant, setVariant] = useAnimation(ref, {
+  initial: "default",
   transition: {
     duration: 3,
     easingStyle: "Quad",
@@ -257,12 +297,19 @@ return (
 );
 ```
 
+<<<<<<< Updated upstream
 Because `useAnimation` simply takes in a ref, you can animate any React component with Motion, even if the `motion` object doesn't have it! If you still want to use the same syntax as you would with the `motion` object but with a different element, Motion also exports `createMotionComponent`:
 
 ```tsx
 import { createMotionComponent } from "@rbxts/react-motion";
 
 const Part = createMotionComponent("Part");
+=======
+Because `useAnimation` simply takes in a ref, you can animate any React component with Motion, even if `Motion` doesn't have it! If you still want to use the same syntax as you would with `Motion` but with a different element, Motion also exports `createComponent`:
+
+```tsx
+const Part = motion.createComponent("Part");
+>>>>>>> Stashed changes
 const part = <Part animate={} initial={} transition={} variants={} />
 ```
 
@@ -286,7 +333,7 @@ const variants = {
   }
 };
 
-const Button = () => {
+function Button() {
   const button = useRef<TextButton>();
   const [variant, setVariant] = useAnimation(button, {
     variants,

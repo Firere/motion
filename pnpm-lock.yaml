@@ -17,6 +17,9 @@ dependencies:
   '@rbxts/services':
     specifier: ^1.5.1
     version: 1.5.1
+  '@rbxts/t':
+    specifier: ^3.1.1
+    version: 3.1.1
 
 devDependencies:
   '@rbxts/compiler-types':
@@ -162,6 +165,10 @@ packages:
 
   /@rbxts/services@1.5.1:
     resolution: {integrity: sha512-SRtfIjga0K4YYSXRpK+eH3kcTq7ZXo9OHOt0jszaOOoEOIJloMGlyuRPqesPHyhveh2AMXAZr3TYbRMSD+u+kQ==}
+    dev: false
+
+  /@rbxts/t@3.1.1:
+    resolution: {integrity: sha512-r+IvHHGLt9ZM8+cJAs5Q7ZyGaSlsbkXTaeat85FxRmjjozykHLbQ24rY/5utJbp63a5uCy3Wyl1fGv/Gk/GnIw==}
     dev: false
 
   /@rbxts/types@1.0.766:

@@ -18,11 +18,16 @@ export type TargetAndTransition<T extends Instance> = Target<T> & {
 
 export type Variants<T extends Instance> = Record<string, TargetAndTransition<T>>;
 
-export type Variant<T extends Instance> = keyof Variants<T> | TargetAndTransition<T>;
+export type VariantLabel = string;
+
+export type CastsToTarget<T extends Instance> =
+	| TargetAndTransition<T>
+	| VariantLabel
+	| (TargetAndTransition<T> | VariantLabel)[];
 
 export interface AnimationProps<T extends Instance> {
-	animate?: Variant<T>;
-	initial?: Variant<T>;
+	animate?: CastsToTarget<T>;
+	initial?: CastsToTarget<T>;
 	transition?: Transition;
 	variants?: Variants<T>;
 }
