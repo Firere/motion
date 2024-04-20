@@ -52,8 +52,24 @@ function castToTargetsAndTransitions<T extends Instance>(
 	transition?: Transition,
 ) {
 	if (animations === undefined) return undefined;
-	if (t.array(t.union(t.string, t.table))(animations))
-		return animations.map((animation) => mergeTransitions(variants, animation, transition));
+	if (t.array(t.union(t.string, t.table))(animations)) {
+		const casted = animations.map((animation) => mergeTransitions(variants, animation, transition));
+
+		const properties = new Set<keyof Partial<Extract<T, Tweenable>>>();
+		// iterate from the right of the array; mark all properties
+		// in that animation as being modified by adding them to `properties`,
+		// unless they've already been modified by an animation which
+		// overrides it
+		for (let i = casted.size() - 1; i >= 0; i--)
+			for (const [key, _] of pairs(casted[i] as object)) {
+				if (key === "transition") continue;
+				if (properties.has(key as never)) {
+					delete casted[i][key as never];
+				} else properties.add(key as never);
+			}
+
+		return casted;
+	}
 	return [mergeTransitions(variants, animations, transition)];
 }
 
@@ -91,9 +107,6 @@ export default function useAnimation<T extends Instance>(
 		if (!element) return;
 
 		const tweens: Tween[] = [];
-		// FIXME each animation may still have properties which overwrite
-		// another's, and multiple tweens get made and played for this;
-		// can fix this by removing properties which get overwritten
 		animations.forEach((animation) => {
 			const properties: Partial<Extract<T, Tweenable>> = {};
 			for (const [key, value] of pairs(animation as object)) {
