@@ -15,28 +15,6 @@ function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"],
 	return variants[variant]!;
 }
 
-// Users can pass in end properties directly, the name of a variant, or an array of both.
-// Since useAnimation has to use these inputs twice, I've put it into its own function to also separate concerns.
-function castToTargetAndTransition<T extends Instance>(
-	allVariants: AnimationProps<T>["variants"],
-	animations: CastsToTarget<T> | undefined,
-): TargetAndTransition<T> | undefined {
-	if (animations === undefined) return undefined;
-
-	if (typeIs(animations, "table")) {
-		// if animations is (TargetAndTransition<T> | VariantLabel)[]
-		if (t.array(t.union(t.string, t.table))(animations)) {
-			return animations.reduce(
-				(accumulator, currentVariant) => ({
-					...accumulator,
-					...(typeIs(currentVariant, "string") ? getVariant(allVariants, currentVariant) : currentVariant),
-				}),
-				{},
-			);
-		} else return animations;
-	} else return getVariant(allVariants, animations);
-}
-
 function mergeTransitions<T extends Instance>(
 	variants: AnimationProps<T>["variants"],
 	animation: string | TargetAndTransition<T>,
@@ -80,61 +58,91 @@ const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
 	enumItem: EnumItem | K | undefined,
 ) => (enumItem !== undefined ? (typeIs(enumItem, "EnumItem") ? enumItem : enumObject[enumItem]) : undefined);
 
-export default function useAnimation<T extends Instance>(
+function castToTweens<T extends Instance>(instance: T, animations: TargetAndTransition<T>[]) {
+	const tweens: Tween[] = [];
+	animations.forEach((animation) => {
+		const properties: Partial<Extract<T, Tweenable>> = {};
+		for (const [key, value] of pairs(animation as object)) {
+			if (key === "transition") continue;
+			properties[key as never] = value as never;
+		}
+		tweens.push(
+			TweenService.Create(
+				instance,
+				new TweenInfo(
+					animation.transition?.duration ?? 1,
+					(castToEnum(Enum.EasingStyle, animation.transition?.easingStyle) as Enum.EasingStyle) ??
+						Enum.EasingStyle.Linear,
+					(castToEnum(Enum.EasingDirection, animation.transition?.easingDirection) as Enum.EasingDirection) ??
+						Enum.EasingDirection.InOut,
+					animation.transition?.repeatCount ?? 0,
+					animation.transition?.reverses ?? false,
+					animation.transition?.delay ?? 0,
+				),
+				properties,
+			),
+		);
+	});
+	return tweens;
+}
+
+export default function <T extends Instance>(
 	ref: React.RefObject<T>,
 	{ animate, initial, transition, variants }: AnimationProps<T>,
 ): [string, (variant: string) => void] {
-	useEffect(() => {
-		const element = ref.current;
-		if (!element) return;
-
-		const toIterate = castToTargetAndTransition(variants, initial);
-
-		if (toIterate !== undefined)
-			for (const [key, value] of pairs(toIterate as object)) {
-				if (key === "transition") continue;
-				element[key as keyof T] = value as T[keyof T];
-			}
-	}, []);
-
 	const [variantState, setVariantState] = useState<CastsToTarget<T>>();
 	const currentAnimations: TargetAndTransition<T>[] =
 		castToTargetsAndTransitions(variants, variantState, transition) ?? [];
+	/**
+	 * ? variantState is overridden by the `animate` prop,
+	 * which in effect makes `setVariant` in a normal use of
+	 * useAnimation useless if `animate` is defined. rethink
+	 * how this is implemented, maybe?
+	 */
 	const animations = castToTargetsAndTransitions(variants, animate, transition) ?? currentAnimations;
 
+	// initial
 	useEffect(() => {
 		const element = ref.current;
 		if (!element) return;
 
-		const tweens: Tween[] = [];
-		animations.forEach((animation) => {
-			const properties: Partial<Extract<T, Tweenable>> = {};
-			for (const [key, value] of pairs(animation as object)) {
-				if (key === "transition") continue;
-				properties[key as never] = value as never;
+		initial ??= true;
+		if (typeIs(initial, "boolean")) {
+			if (initial) {
+				const tweens = castToTweens(element, animations);
+				tweens.forEach((tween) => tween.Play());
+				return () => tweens.forEach((tween) => tween.Destroy());
 			}
-			tweens.push(
-				TweenService.Create(
-					element,
-					new TweenInfo(
-						animation.transition?.duration ?? 1,
-						(castToEnum(Enum.EasingStyle, animation.transition?.easingStyle) as Enum.EasingStyle) ??
-							Enum.EasingStyle.Linear,
-						(castToEnum(
-							Enum.EasingDirection,
-							animation.transition?.easingDirection,
-						) as Enum.EasingDirection) ?? Enum.EasingDirection.InOut,
-						animation.transition?.repeatCount ?? 0,
-						animation.transition?.reverses ?? false,
-						animation.transition?.delay ?? 0,
-					),
-					properties,
-				),
-			);
-		});
 
+			return animations.forEach((animation) => {
+				for (const [key, value] of pairs(animation as object)) {
+					if (key === "transition") continue;
+					element[key as never] = value as never;
+				}
+			});
+		}
+
+		for (const [key, value] of pairs(
+			castToTargetsAndTransitions(variants, initial, {})!.reduce(
+				(accumulator, targetAndTransition) => ({
+					...accumulator,
+					...targetAndTransition,
+				}),
+				{},
+			) as object,
+		)) {
+			if (key === "transition") continue;
+			element[key as keyof T] = value as T[keyof T];
+		}
+	}, []);
+
+	// animate
+	useEffect(() => {
+		const element = ref.current;
+		if (!element) return;
+
+		const tweens = castToTweens(element, animations);
 		tweens.forEach((tween) => tween.Play());
-
 		return () => tweens.forEach((tween) => tween.Destroy());
 	}, [ref, variants, variantState, animate, transition]);
 
