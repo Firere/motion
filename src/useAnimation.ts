@@ -138,5 +138,5 @@ export default function useAnimation<T extends Instance>(
 		return () => tweens.forEach((tween) => tween.Destroy());
 	}, [ref, variants, variantState, animate, transition]);
 
-	return [typeIs(variantState, "string") ? variantState : "", (variant: string) => setVariantState(variant)];
+	return [typeIs(variantState, "string") ? variantState : "", setVariantState];
 }
