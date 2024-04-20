@@ -1,4 +1,3 @@
-import Object from "@rbxts/object-utils";
 import React from "@rbxts/react";
 import type { AnimationProps } from ".";
 import useAnimation from "./useAnimation";
@@ -17,11 +16,11 @@ export function createMotionComponent<
 		const ref = (forwardedRef as React.RefObject<T>) ?? React.createRef<T>();
 		useAnimation(ref, { animate, initial, transition, variants });
 
-		const rest = Object.fromEntries(
-			Object.entries(props).filter(
-				([key]) => !["initial", "animate", "transition", "variants", "ref"].includes(key as string),
-			) as readonly (readonly [string | number | symbol, unknown])[],
-		) as React.InstanceProps<T>;
+		const rest: React.InstanceProps<T> = {};
+		for (const [key, value] of pairs(props as object)) {
+			if (["animate", "initial", "transition", "ref", "variants"].includes(key as string)) continue;
+			rest[key as never] = value as never;
+		}
 
 		return React.createElement(elementType, {
 			...rest,

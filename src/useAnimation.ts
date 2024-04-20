@@ -2,7 +2,7 @@ import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import type { AnimationProps, CastsToTarget, TargetAndTransition, Transition } from ".";
+import type { AnimationProps, CastsToTarget, TargetAndTransition } from ".";
 
 // Users can pass in end properties directly, the name of a variant, or an array of both.
 // Since useAnimation has to use these inputs twice, I've put it into its own function to also separate concerns.
@@ -63,17 +63,13 @@ export default function useAnimation<T extends Instance>(
 	const currentVariant: TargetAndTransition<T> = castToTargetAndTransition(variants, variantState) ?? {};
 	const animationVariant = castToTargetAndTransition(variants, animate) ?? currentVariant;
 
-	let animationProperties: Partial<ExtractMembers<T, Tweenable>> = {};
-	let mergedTransition: Transition = {};
+	const animationProperties: Partial<ExtractMembers<T, Tweenable>> = {};
+	for (const [key, value] of pairs(animationVariant as object)) {
+		if (key === "transition") continue;
+		animationProperties[key as never] = value as never;
+	}
 
-	animationProperties = Object.entries(animationVariant)
-		.filter(([key]) => key !== "transition")
-		.reduce((acc, [key, value]) => {
-			(acc as Record<string, unknown>)[key as string] = value;
-			return acc;
-		}, {});
-
-	mergedTransition = {
+	const mergedTransition = {
 		...transition,
 		...animationVariant.transition,
 	};
