@@ -103,7 +103,22 @@ return (
 
 This will work exactly the same as the example above, however now you can reference the initial `size` directly without it rerendering each time.
 
-*To be honest, I'm not sure what the purpose of `initial` exactly is or why it was in the original `@rbxts/motion`, or if this is even how it's supposed to work - upstream doesn't have it properly implemented. I got ghosted when I tried to ask the original author, so this is here to stay I guess.*
+As a shortened version, if your  `animate` and `initial` props are the same, you can just pass `false`:
+
+```tsx
+const [size, setSize] = useState(UDim2.fromOffset(200, 50));
+
+return (
+  <motion.textbutton
+    animate={{ Size: size }}
+    initial={false}
+    Event={{
+      Activated: () => setSize(size => UDim2.fromOffset(size.X.Offset + 50, size.Y.Offset + 50)),
+    }}
+    Text="Increase the size of this button!"
+  />
+);
+```
 
 ## Variants
 
