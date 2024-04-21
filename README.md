@@ -59,6 +59,29 @@ return (
 );
 ```
 
+Additionally, Motion enables you to use cubic Bézier easing functions, [similarly to how you would in CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function#cubic-bezier-easing-function):
+
+```tsx
+const [size, setSize] = useState(UDim2.fromOffset(200, 50));
+
+return (
+  <motion.textbutton
+    animate={{ Size: size }}
+    Event={{
+      Activated: () => setSize(size => UDim2.fromOffset(size.X.Offset + 50, size.Y.Offset + 50)),
+    }}
+    Size={UDim2.fromOffset(200, 50)}
+    Text="Increase the size of this button!"
+    transition={{
+      duration: 1,
+      easingFunction: [0.25, 0.1, 0.25, 1], // equivalent to `ease` in CSS
+    }}  
+  />
+);
+```
+
+When you define `easingFunction`, all other settings apart from `duration` will have no effect.
+
 ## The `initial` prop
 
 The `initial` prop defines the properties for a Motion component to be set at the beginning. It differs from just setting props normally, as you can reference variants (more on those later) and state without it changing:

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import type { AnimationProps, CastsToTarget, TargetAndTransition, Transition } from ".";
+import BezierTween from "@firere/bezier-tween";
 
 function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: string) {
 	if (variants === undefined) error(`Variant "${variant}" cannot be set because no variants have been set`);
@@ -58,8 +59,9 @@ const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
 	enumItem: EnumItem | K | undefined,
 ) => (enumItem !== undefined ? (typeIs(enumItem, "EnumItem") ? enumItem : enumObject[enumItem]) : undefined);
 
-function castToTweens<T extends Instance>(instance: T, animations: TargetAndTransition<T>[]) {
-	const tweens: Tween[] = [];
+function tween<T extends Instance>(instance: T, animations: TargetAndTransition<T>[]) {
+	const tweens: (BezierTween<T> | Tween)[] = [];
+
 	animations.forEach((animation) => {
 		const properties: Partial<Extract<T, Tweenable>> = {};
 		for (const [key, value] of pairs(animation as object)) {
@@ -67,23 +69,35 @@ function castToTweens<T extends Instance>(instance: T, animations: TargetAndTran
 			properties[key as never] = value as never;
 		}
 		tweens.push(
-			TweenService.Create(
-				instance,
-				new TweenInfo(
-					animation.transition?.duration ?? 1,
-					(castToEnum(Enum.EasingStyle, animation.transition?.easingStyle) as Enum.EasingStyle) ??
-						Enum.EasingStyle.Linear,
-					(castToEnum(Enum.EasingDirection, animation.transition?.easingDirection) as Enum.EasingDirection) ??
-						Enum.EasingDirection.InOut,
-					animation.transition?.repeatCount ?? 0,
-					animation.transition?.reverses ?? false,
-					animation.transition?.delay ?? 0,
-				),
-				properties,
-			),
+			animation.transition?.easingFunction === undefined
+				? TweenService.Create(
+						instance,
+						new TweenInfo(
+							animation.transition?.duration ?? 1,
+							(castToEnum(Enum.EasingStyle, animation.transition?.easingStyle) as Enum.EasingStyle) ??
+								Enum.EasingStyle.Linear,
+							(castToEnum(
+								Enum.EasingDirection,
+								animation.transition?.easingDirection,
+							) as Enum.EasingDirection) ?? Enum.EasingDirection.InOut,
+							animation.transition?.repeatCount ?? 0,
+							animation.transition?.reverses ?? false,
+							animation.transition?.delay ?? 0,
+						),
+						properties,
+				  )
+				: new BezierTween(
+						animation.transition?.easingFunction,
+						instance,
+						animation.transition?.duration ?? 1,
+						properties,
+				  ),
 		);
 	});
-	return tweens;
+
+	tweens.forEach((tween) => (typeIs(tween, "Instance") ? tween.Play() : tween.Play()));
+	return () =>
+		tweens.forEach((tween) => (typeIs(tween, "Instance") ? tween.Destroy() : tween.connection?.Disconnect()));
 }
 
 export default function <T extends Instance>(
@@ -108,11 +122,7 @@ export default function <T extends Instance>(
 
 		initial ??= true;
 		if (typeIs(initial, "boolean")) {
-			if (initial) {
-				const tweens = castToTweens(element, animations);
-				tweens.forEach((tween) => tween.Play());
-				return () => tweens.forEach((tween) => tween.Destroy());
-			}
+			if (initial) return tween(element, animations);
 
 			return animations.forEach((animation) => {
 				for (const [key, value] of pairs(animation as object)) {
@@ -138,12 +148,7 @@ export default function <T extends Instance>(
 
 	// animate
 	useEffect(() => {
-		const element = ref.current;
-		if (!element) return;
-
-		const tweens = castToTweens(element, animations);
-		tweens.forEach((tween) => tween.Play());
-		return () => tweens.forEach((tween) => tween.Destroy());
+		if (ref.current) return tween(ref.current, animations);
 	}, [ref, variants, variantState, animate, transition]);
 
 	return [typeIs(variantState, "string") ? variantState : "", setVariantState];

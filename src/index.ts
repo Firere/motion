@@ -5,6 +5,7 @@ export interface Transition {
 	duration?: number;
 	easingStyle?: Enum.EasingStyle | (CastsToEnum<Enum.EasingStyle> & string);
 	easingDirection?: Enum.EasingDirection | (CastsToEnum<Enum.EasingDirection> & string);
+	easingFunction?: [x1: number, y1: number, x2: number, y2: number];
 	reverses?: boolean;
 	repeatCount?: number;
 	delay?: number;
