@@ -5,9 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@firere/bezier-tween':
-    specifier: ^0.0.2
-    version: 0.0.2
+  '@rbxts/cubic-bezier':
+    specifier: ^1.1.0
+    version: 1.1.0
   '@rbxts/object-utils':
     specifier: ^1.0.4
     version: 1.0.4
@@ -101,13 +101,6 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@firere/bezier-tween@0.0.2:
-    resolution: {integrity: sha512-defx7FGPF4Kl7cUbBCDqHOKLti+jUmI9LKDEbAK5Z9V7bcLFmys34LVqiVCBVxI2hKEmskwieeYa/WF7lLWoFA==}
-    dependencies:
-      '@rbxts/cubic-bezier': 1.1.0
-      '@rbxts/services': 1.5.4
-    dev: false
-
   /@humanwhocodes/config-array@0.11.8:
     resolution: {integrity: sha512-UybHIJzJnR5Qc/MsD9Kr+RpO2h+/P1GhOwdiLPXK5TWk5sgTdu88bTD9UP+CKbPPh5Rni1u0GjAdYQLemG8g+g==}
     engines: {node: '>=10.10.0'}
@@ -179,10 +172,6 @@ packages:
 
   /@rbxts/services@1.5.1:
     resolution: {integrity: sha512-SRtfIjga0K4YYSXRpK+eH3kcTq7ZXo9OHOt0jszaOOoEOIJloMGlyuRPqesPHyhveh2AMXAZr3TYbRMSD+u+kQ==}
-    dev: false
-
-  /@rbxts/services@1.5.4:
-    resolution: {integrity: sha512-Klh+gRIT8zy3xRTX1YD6FZ9nAMzkzPLTHmciigt59PEF7PJXo31CF0IU0RegQ7VSMrz1iOnXwxbIwy3htcMfOA==}
     dev: false
 
   /@rbxts/t@3.1.1:
