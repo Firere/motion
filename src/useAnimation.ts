@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import type { AnimationProps, CastsToTarget, TargetAndTransition, Transition } from ".";
-import BezierTween from "./BezierTween/src/index";
+import BezierTween from "./BezierTween";
 
 function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: string) {
 	if (variants === undefined) error(`Variant "${variant}" cannot be set because no variants have been set`);
