@@ -6,14 +6,14 @@ import type { AnimationProps, CastsToTarget, TargetAndTransition, Transition } f
 import BezierTween from "./BezierTween";
 
 function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: string) {
-	if (variants === undefined) error(`Variant "${variant}" cannot be set because no variants have been set`);
-	if (!(variant in variants))
-		error(
-			`Variant "${tostring(variant)}" is invalid: ${Object.keys(variants)
-				.filter((v) => typeIs(v, "string"))
-				.join(", ")}`,
-		);
-	return variants[variant]!;
+	assert(variants, `Variant "${variant}" cannot be set because no variants have been set`);
+	assert(
+		variant in variants,
+		`Variant "${tostring(variant)}" is invalid: ${Object.keys(variants)
+			.filter((v) => typeIs(v, "string"))
+			.join(", ")}`,
+	);
+	return variants[variant];
 }
 
 function mergeTransitions<T extends Instance>(
