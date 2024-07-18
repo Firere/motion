@@ -16,7 +16,7 @@ function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"],
 	return variants[variant];
 }
 
-function mergeTransitions<T extends Instance>(
+function addDefaultTransition<T extends Instance>(
 	variants: AnimationProps<T>["variants"],
 	animation: string | TargetAndTransition<T>,
 	transition?: Transition,
@@ -32,24 +32,27 @@ function castToTargetsAndTransitions<T extends Instance>(
 ) {
 	if (animations === undefined) return undefined;
 	if (t.array(t.union(t.string, t.table))(animations)) {
-		const casted = animations.map((animation) => mergeTransitions(variants, animation, transition));
+		const casted = animations.map((animation) => addDefaultTransition(variants, animation, transition));
 
-		const properties = new Set<keyof Partial<Extract<T, Tweenable>>>();
-		// iterate from the right of the array; mark all properties
-		// in that animation as being modified by adding them to `properties`,
-		// unless they've already been modified by an animation which
-		// overrides it
+		// some animations may apply to the same property, resulting in multiple
+		// Tweens potentially messing with it, so all conflicts are handled here
+		const alreadyModified = new Set<keyof Partial<Extract<T, Tweenable>>>();
 		for (let i = casted.size() - 1; i >= 0; i--)
 			for (const [key, _] of pairs(casted[i] as object)) {
 				if (key === "transition") continue;
-				if (properties.has(key as never)) {
+				if (alreadyModified.has(key as never)) {
 					delete casted[i][key as never];
-				} else properties.add(key as never);
+				} else alreadyModified.add(key as never);
 			}
 
 		return casted;
 	}
-	return [mergeTransitions(variants, animations, transition)];
+	return [addDefaultTransition(variants, animations, transition)];
+}
+
+function applyTarget<T extends Instance>(toCopy: TargetAndTransition<T>, applyOn: object) {
+	for (const [key, value] of pairs(toCopy as object))
+		if (key !== "transition") applyOn[key as never] = value as never;
 }
 
 // sure is great TweenInfo.new is one of the only
@@ -57,45 +60,37 @@ function castToTargetsAndTransitions<T extends Instance>(
 const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
 	enumObject: T,
 	enumItem: EnumItem | K | undefined,
-) => (enumItem !== undefined ? (typeIs(enumItem, "EnumItem") ? enumItem : enumObject[enumItem]) : undefined);
+) => (typeIs(enumItem, "string") ? enumObject[enumItem] : enumItem);
 
 function tween<T extends Instance>(instance: T, animations: TargetAndTransition<T>[]) {
 	const tweens: (BezierTween<T> | Tween)[] = [];
 
 	animations.forEach((animation) => {
+		const { transition } = animation;
 		const properties: Partial<Extract<T, Tweenable>> = {};
-		for (const [key, value] of pairs(animation as object)) {
-			if (key === "transition") continue;
-			properties[key as never] = value as never;
-		}
+		applyTarget(animation, properties);
+
 		tweens.push(
-			animation.transition?.easingFunction === undefined
+			transition?.easingFunction === undefined
 				? TweenService.Create(
 						instance,
 						new TweenInfo(
-							animation.transition?.duration ?? 1,
-							(castToEnum(Enum.EasingStyle, animation.transition?.easingStyle) as Enum.EasingStyle) ??
+							transition?.duration ?? 1,
+							(castToEnum(Enum.EasingStyle, transition?.easingStyle) as Enum.EasingStyle) ??
 								Enum.EasingStyle.Linear,
-							(castToEnum(
-								Enum.EasingDirection,
-								animation.transition?.easingDirection,
-							) as Enum.EasingDirection) ?? Enum.EasingDirection.InOut,
-							animation.transition?.repeatCount ?? 0,
-							animation.transition?.reverses ?? false,
-							animation.transition?.delay ?? 0,
+							(castToEnum(Enum.EasingDirection, transition?.easingDirection) as Enum.EasingDirection) ??
+								Enum.EasingDirection.InOut,
+							transition?.repeatCount ?? 0,
+							transition?.reverses ?? false,
+							transition?.delay ?? 0,
 						),
 						properties,
 				  )
-				: new BezierTween(
-						animation.transition?.easingFunction,
-						instance,
-						animation.transition?.duration ?? 1,
-						properties,
-				  ),
+				: new BezierTween(transition?.easingFunction, instance, transition?.duration ?? 1, properties),
 		);
 	});
 
-	tweens.forEach((tween) => (typeIs(tween, "Instance") ? tween.Play() : tween.Play()));
+	tweens.forEach((tween) => (tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
 	return () =>
 		tweens.forEach((tween) => (typeIs(tween, "Instance") ? tween.Destroy() : tween.connection?.Disconnect()));
 }
@@ -122,33 +117,29 @@ export default function <T extends Instance>(
 
 		initial ??= true;
 		if (typeIs(initial, "boolean")) {
-			if (initial) return tween(element, animations);
-
-			return animations.forEach((animation) => {
-				for (const [key, value] of pairs(animation as object)) {
-					if (key === "transition") continue;
-					element[key as never] = value as never;
-				}
-			});
+			if (initial) {
+				tween(element, animations);
+			} else {
+				animations.forEach((animation) => applyTarget(animation, element));
+			}
+			return;
 		}
 
-		for (const [key, value] of pairs(
+		applyTarget(
 			castToTargetsAndTransitions(variants, initial, {})!.reduce(
 				(accumulator, targetAndTransition) => ({
 					...accumulator,
 					...targetAndTransition,
 				}),
 				{},
-			) as object,
-		)) {
-			if (key === "transition") continue;
-			element[key as keyof T] = value as T[keyof T];
-		}
+			),
+			element,
+		);
 	}, []);
 
 	// animate
 	useEffect(() => {
-		if (ref.current) return tween(ref.current, animations);
+		if (ref.current) tween(ref.current, animations);
 	}, [ref, variants, variantState, animate, transition]);
 
 	return [typeIs(variantState, "string") ? variantState : "", setVariantState];
