@@ -1,0 +1,3 @@
+[submodule "src/bezier-tween"]
+	path = src/bezier-tween
+	url = https://github.com/Firere/bezier-tween
