@@ -139,7 +139,7 @@ export default function <T extends Instance>(
 
 	// animate
 	useEffect(() => {
-		if (ref.current) tween(ref.current, animations);
+		if (ref.current) return tween(ref.current, animations);
 	}, [ref, variants, variantState, animate, transition]);
 
 	return [typeIs(variantState, "string") ? variantState : "", setVariantState];
