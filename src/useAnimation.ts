@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import type { AnimationProps, CastsToTarget, TargetAndTransition, Transition } from ".";
-import BezierTween from "./BezierTween";
+import BezierTween from "./bezier-tween/src";
 
 function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: string) {
 	assert(variants, `Variant "${variant}" cannot be set because no variants have been set`);
@@ -86,13 +86,22 @@ function tween<T extends Instance>(instance: T, animations: TargetAndTransition<
 						),
 						properties,
 				  )
-				: new BezierTween(transition?.easingFunction, instance, transition?.duration ?? 1, properties),
+				: new BezierTween(
+						instance,
+						{
+							time: transition.duration,
+							bezier: transition.easingFunction,
+							repeatCount: transition.repeatCount,
+							reverses: transition.reverses,
+							delayTime: transition.delay,
+						},
+						properties,
+				  ),
 		);
 	});
 
 	tweens.forEach((tween) => (tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
-	return () =>
-		tweens.forEach((tween) => (typeIs(tween, "Instance") ? tween.Destroy() : tween.connection?.Disconnect()));
+	return () => tweens.forEach((tween) => (tween as Tween).Destroy());
 }
 
 export default function <T extends Instance>(

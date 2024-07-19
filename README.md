@@ -59,7 +59,7 @@ return (
 );
 ```
 
-Additionally, Motion enables you to use cubic Bézier easing functions, [similarly to how you would in CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function#cubic-bezier-easing-function):
+Additionally, Motion allows you to use cubic Bézier easing functions, [similarly to how you would in CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function#cubic-bezier-easing-function):
 
 ```tsx
 const [size, setSize] = useState(UDim2.fromOffset(200, 50));
@@ -80,7 +80,10 @@ return (
 );
 ```
 
-When you define `easingFunction`, all other settings apart from `duration` will have no effect.
+If you define `easingFunction`, then `easingDirection` and `easingStyle` will have no effect, and a Bézier tween will be used instead of a native Roblox tween.
+
+>[!WARNING]
+>Bézier tweens are experimental and unlikely to behave exactly as regular tweens, though they aim to do so. Expect bugs and strange behaviour.
 
 ## The `initial` prop
 
