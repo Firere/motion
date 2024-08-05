@@ -1,6 +1,6 @@
 {
 	"name": "@rbxts/react-motion",
-	"version": "1.5.1",
+	"version": "1.5.2-t0",
 	"author": "firere",
 	"description": "Motion for React",
 	"main": "out/init.lua",
@@ -18,6 +18,8 @@
 	"types": "out/index.d.ts",
 	"files": [
 		"out",
+		"!out/bezier-tween/*",
+		"out/bezier-tween/src/*",
 		"!**/*.tsbuildinfo"
 	],
 	"publishConfig": {
