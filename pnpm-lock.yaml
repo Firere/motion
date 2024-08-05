@@ -12,11 +12,11 @@ dependencies:
     specifier: ^1.0.4
     version: 1.0.4
   '@rbxts/react':
-    specifier: ^0.3.6
-    version: 0.3.6
+    specifier: ^0.4.0
+    version: 0.4.0
   '@rbxts/react-roblox':
-    specifier: ^0.3.6
-    version: 0.3.6
+    specifier: ^0.4.0
+    version: 0.4.0
   '@rbxts/services':
     specifier: ^1.5.1
     version: 1.5.1
@@ -154,20 +154,25 @@ packages:
     resolution: {integrity: sha512-dLLhf022ipV+9i910sOE7kl9losKHoon0WgeerHqVMQA5EYsLUsVT2AxhJuhk8MiDn5oJ2GiFofE/LadY9TpJQ==}
     dev: false
 
-  /@rbxts/react-roblox@0.3.6:
-    resolution: {integrity: sha512-4o6UUPXHZMZuUuAl92aTe/b1YoQkuPFsah3iQVV+Ic50cJivX0cBqEs5sGj6GviBUbQI1ZilYBhlc0/uk63iSA==}
+  /@rbxts/react-roblox@0.4.0:
+    resolution: {integrity: sha512-nse7mc7aLS78zfaXNfqeXX0vllRGnGQBKcrnl3FeDJo9+7oMKLF4mLAtrCkQ5ojZOnNKNcDPE7PKmOX7Q8QguQ==}
     dependencies:
-      '@rbxts/react': 0.3.6
-      '@rbxts/react-vendor': 0.3.6
+      '@rbxts/react': 0.4.0
+      '@rbxts/react-vendor': 0.4.0
     dev: false
 
   /@rbxts/react-vendor@0.3.6:
     resolution: {integrity: sha512-q3HilP6ZNHSgWW0lwka+Ft4Iq+fnPBppOeQhGua1XCtM2hEqhmUmME8DI1UlnaK/aGzdYW1bWC7YfHZhHGsIeA==}
+    dev: true
 
-  /@rbxts/react@0.3.6:
-    resolution: {integrity: sha512-GeEqKjjyJT3zG85xEVCu3IMQdYRoXk4P9XCua4oriTIfuJaSTOWUukOmQ5ILpG/BpksLqXlpH8zqKKZcZaIs3g==}
+  /@rbxts/react-vendor@0.4.0:
+    resolution: {integrity: sha512-roWs9FmR7CQDK1N6gE/36tiCBQRl8v1S0pUJD2Ly3ZMVvfjAk2gixrkqGcKFGtXQQq6r4dTAtHduAeZJBd640g==}
+    dev: false
+
+  /@rbxts/react@0.4.0:
+    resolution: {integrity: sha512-yhqXzfH5YpwfZyiWipQMfQsI//2sC86Jqn2rMkP+l1y4CfhCvoYxpaI5qS7Xum9F+DsBHiwJNeUxm2V2LzXW0A==}
     dependencies:
-      '@rbxts/react-vendor': 0.3.6
+      '@rbxts/react-vendor': 0.4.0
     dev: false
 
   /@rbxts/services@1.5.1:
