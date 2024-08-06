@@ -1,6 +1,6 @@
 {
 	"name": "@rbxts/react-motion",
-	"version": "1.5.2",
+	"version": "1.5.3-t0",
 	"author": "firere",
 	"description": "Motion for React",
 	"main": "out/init.lua",
@@ -39,6 +39,7 @@
 		"typescript": "^5.4.3"
 	},
 	"dependencies": {
+		"@firere/bezier-tween": "^1.0.1",
 		"@rbxts/cubic-bezier": "^1.1.0",
 		"@rbxts/object-utils": "^1.0.4",
 		"@rbxts/services": "^1.5.1",
