@@ -1,6 +1,6 @@
 {
 	"name": "@rbxts/react-motion",
-	"version": "1.5.2-t1",
+	"version": "1.5.2-t2",
 	"author": "firere",
 	"description": "Motion for React",
 	"main": "out/init.lua",
@@ -46,7 +46,7 @@
 		"@rbxts/t": "^3.1.1"
 	},
 	"peerDependencies": {
-		"@rbxts/react": "^0.4.0",
-		"@rbxts/react-roblox": "^0.4.0"
+		"@rbxts/react": "*",
+		"@rbxts/react-roblox": "*"
 	}
 }
