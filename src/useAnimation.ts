@@ -122,7 +122,7 @@ export default function <T extends Instance>(
 	// initial
 	useEffect(() => {
 		const element = ref.current;
-		if (!element) return;
+		if (element === undefined) return;
 
 		initial ??= true;
 		if (typeIs(initial, "boolean")) {
@@ -148,7 +148,7 @@ export default function <T extends Instance>(
 
 	// animate
 	useEffect(() => {
-		if (ref.current) return tween(ref.current, animations);
+		if (ref.current !== undefined) return tween(ref.current, animations);
 	}, [ref, variants, variantState, animate, transition]);
 
 	return [typeIs(variantState, "string") ? variantState : "", setVariantState];
