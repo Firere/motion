@@ -11,9 +11,6 @@ dependencies:
   '@rbxts/object-utils':
     specifier: ^1.0.4
     version: 1.0.4
-  '@rbxts/react':
-    specifier: '*'
-    version: 0.4.0
   '@rbxts/react-roblox':
     specifier: '*'
     version: 0.4.0
@@ -28,6 +25,9 @@ devDependencies:
   '@rbxts/compiler-types':
     specifier: 2.3.0-types.0
     version: 2.3.0-types.0
+  '@rbxts/react':
+    specifier: ^0.4.0
+    version: 0.4.0
   '@rbxts/types':
     specifier: ^1.0.766
     version: 1.0.766
@@ -160,20 +160,14 @@ packages:
 
   /@rbxts/react-vendor@0.4.0:
     resolution: {integrity: sha512-roWs9FmR7CQDK1N6gE/36tiCBQRl8v1S0pUJD2Ly3ZMVvfjAk2gixrkqGcKFGtXQQq6r4dTAtHduAeZJBd640g==}
-    dev: false
 
   /@rbxts/react@0.4.0:
     resolution: {integrity: sha512-yhqXzfH5YpwfZyiWipQMfQsI//2sC86Jqn2rMkP+l1y4CfhCvoYxpaI5qS7Xum9F+DsBHiwJNeUxm2V2LzXW0A==}
     dependencies:
       '@rbxts/react-vendor': 0.4.0
-    dev: false
 
   /@rbxts/services@1.5.1:
     resolution: {integrity: sha512-SRtfIjga0K4YYSXRpK+eH3kcTq7ZXo9OHOt0jszaOOoEOIJloMGlyuRPqesPHyhveh2AMXAZr3TYbRMSD+u+kQ==}
-    dev: false
-
-  /@rbxts/services@1.5.4:
-    resolution: {integrity: sha512-Klh+gRIT8zy3xRTX1YD6FZ9nAMzkzPLTHmciigt59PEF7PJXo31CF0IU0RegQ7VSMrz1iOnXwxbIwy3htcMfOA==}
     dev: false
 
   /@rbxts/t@3.1.1:
