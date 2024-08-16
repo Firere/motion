@@ -46,7 +46,6 @@
 		"@rbxts/t": "^3.1.1"
 	},
 	"peerDependencies": {
-		"@rbxts/react": "*",
-		"@rbxts/react-roblox": "*"
+		"@rbxts/react": "*"
 	}
 }
