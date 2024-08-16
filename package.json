@@ -9,9 +9,9 @@
 		"url": "git+https://github.com/Firere/motion.git"
 	},
 	"scripts": {
-		"build": "npx rbxtsc",
-		"watch": "npx rbxtsc -w",
-		"prepublishOnly": "pnpm run build"
+		"build": "bunx rbxtsc",
+		"watch": "bunx rbxtsc -w",
+		"prepublishOnly": "bun run build"
 	},
 	"keywords": [],
 	"license": "ISC",
