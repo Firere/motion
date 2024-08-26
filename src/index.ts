@@ -1,5 +1,5 @@
 import { createMotionComponent, motion } from "./motion";
-import Spritesheet from "./Spritesheet";
+import useSpritesheet from "./useSpritesheet";
 import useAnimation from "./useAnimation";
 
 export interface Transition {
@@ -35,4 +35,4 @@ export interface AnimationProps<T extends Instance> {
 }
 
 export default motion;
-export { createMotionComponent, Spritesheet, useAnimation };
+export { createMotionComponent, useAnimation, useSpritesheet };
