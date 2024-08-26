@@ -15,7 +15,7 @@ export default ({
 	sprites: number;
 	spritesPerAxis: number;
 	vertical?: boolean;
-}): [Vector2, React.Binding<Vector2>] => {
+}): [React.Binding<Vector2>, Vector2] => {
 	const rectSize = useMemo(
 		() =>
 			vertical
@@ -87,5 +87,5 @@ export default ({
 		} else stop();
 	}, [mode]);
 
-	return [rectSize, rectOffset];
+	return [rectOffset, rectSize];
 };
