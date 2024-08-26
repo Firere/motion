@@ -1,7 +1,7 @@
 {
 	"name": "@rbxts/react-motion",
 	"version": "1.5.3",
-	"author": "firere",
+	"author": "Firere",
 	"description": "Motion for React",
 	"main": "out/init.lua",
 	"repository": {
