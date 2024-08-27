@@ -17,7 +17,7 @@ export default ({
 	sprites: number;
 	spritesPerAxis: number;
 	vertical?: boolean;
-}): [React.Binding<Vector2>, Vector2] => {
+}): [React.Binding<Vector2>, Vector2, (frame: number) => void] => {
 	const rectSize = useMemo(
 		() =>
 			vertical
@@ -39,6 +39,19 @@ export default ({
 	const secondsElapsed = useRef(0); // since last frame played
 	const secondsPerFrame = useMemo(() => 1 / fps, [fps]);
 	const shouldReplay = useRef(mode === "loop");
+
+	const setToFrame = useCallback(
+		(frame: number) => {
+			const line = math.floor(frame / spritesPerAxis);
+			const positionInLine = line * spritesPerAxis - frame;
+			updateRectOffset(
+				vertical
+					? new Vector2(line * rectSize.X, positionInLine * rectSize.Y)
+					: new Vector2(positionInLine * rectSize.X, line * rectSize.Y),
+			);
+		},
+		[spritesPerAxis, vertical],
+	);
 
 	const stop = useCallback(() => {
 		connection.current?.Disconnect();
@@ -81,7 +94,7 @@ export default ({
 		});
 	}, []);
 
-	useEffect(start, []);
+	useEffect(() => setToFrame(startFrame), []);
 
 	useEffect(() => {
 		if (mode === "loop" || mode === "playOnce") {
@@ -90,5 +103,5 @@ export default ({
 		} else stop();
 	}, [mode]);
 
-	return [rectOffset, rectSize];
+	return [rectOffset, rectSize, setToFrame];
 };
