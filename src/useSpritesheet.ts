@@ -67,12 +67,11 @@ export default ({
 			secondsElapsed.current += deltaTime;
 
 			while (secondsElapsed.current > secondsPerFrame) {
-				if (frame.current === endFrame && shouldReplay.current) {
-					frame.current = startFrame;
-				} else if (frame.current === endFrame && !shouldReplay.current) {
-					stop();
-					break;
-				}
+				if (frame.current === endFrame)
+					if (!shouldReplay.current) {
+						stop();
+						break;
+					} else frame.current = startFrame;
 
 				setToFrame(frame.current);
 				frame.current++;
