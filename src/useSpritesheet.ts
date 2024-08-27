@@ -61,7 +61,7 @@ export default ({
 				const currentLine = math.floor(frame.current / spritesPerAxis);
 				if (frame.current / spritesPerAxis === currentLine) {
 					// reached end of this line, move onto next one
-					const newLine = currentLine * (vertical ? rectSize.Y : rectSize.X);
+					const newLine = currentLine * (vertical ? rectSize.X : rectSize.Y);
 					updateRectOffset(vertical ? new Vector2(newLine, 0) : new Vector2(0, newLine));
 				} else {
 					const current = rectOffset.getValue();
