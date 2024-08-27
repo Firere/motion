@@ -5,6 +5,7 @@ export default ({
 	fps = 15,
 	imageResolution,
 	mode = "loop",
+	range,
 	sprites,
 	spritesPerAxis,
 	vertical = false,
@@ -12,6 +13,7 @@ export default ({
 	fps?: number;
 	imageResolution: Vector2;
 	mode?: "static" | "playOnce" | "loop";
+	range?: [number, number];
 	sprites: number;
 	spritesPerAxis: number;
 	vertical?: boolean;
@@ -31,7 +33,8 @@ export default ({
 	);
 	const [rectOffset, updateRectOffset] = useBinding(new Vector2());
 	const connection = useRef<RBXScriptConnection>();
-	const frame = useRef(0);
+	const [startFrame, endFrame] = useMemo(() => (range ? range : [0, sprites]), [range]);
+	const frame = useRef(startFrame);
 
 	const secondsElapsed = useRef(0); // since last frame played
 	const secondsPerFrame = useMemo(() => 1 / fps, [fps]);
@@ -51,9 +54,9 @@ export default ({
 			secondsElapsed.current += deltaTime;
 
 			while (secondsElapsed.current > secondsPerFrame) {
-				if (frame.current === sprites && shouldReplay.current) {
-					frame.current = 0;
-				} else if (frame.current === sprites && !shouldReplay.current) {
+				if (frame.current === endFrame && shouldReplay.current) {
+					frame.current = startFrame;
+				} else if (frame.current === endFrame && !shouldReplay.current) {
 					stop();
 					break;
 				}
