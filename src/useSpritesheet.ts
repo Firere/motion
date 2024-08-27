@@ -43,7 +43,7 @@ export default ({
 	const setToFrame = useCallback(
 		(frame: number) => {
 			const line = math.floor(frame / spritesPerAxis);
-			const positionInLine = line * spritesPerAxis - frame;
+			const positionInLine = frame - line * spritesPerAxis;
 			updateRectOffset(
 				vertical
 					? new Vector2(line * rectSize.X, positionInLine * rectSize.Y)
