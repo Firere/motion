@@ -33,7 +33,7 @@ export default ({
 	);
 	const [rectOffset, updateRectOffset] = useBinding(new Vector2());
 	const connection = useRef<RBXScriptConnection>();
-	const [startFrame, endFrame] = useMemo(() => (range ? range : [0, sprites]), [range]);
+	const [startFrame, endFrame] = useMemo(() => range ?? [0, sprites], [range]);
 	const frame = useRef(startFrame);
 
 	const secondsElapsed = useRef(0); // since last frame played
