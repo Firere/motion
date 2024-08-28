@@ -7,6 +7,7 @@ A port of `@rbxts/motion` to React.
 - [Transitions](#transitions)
 - [The `initial` prop](#the-initial-prop)
 - [Variants](#variants)
+- [Sprite animations](#sprite-animations)
 - [Copy & paste example using `motion` object](#copy--paste-example-using-motion-object-works-with-hoarcekat)
 - [useAnimation](#useanimation)
 - [Copy & paste example using `useAnimation`](#copy--paste-example-using-useanimation-works-with-hoarcekat)
@@ -235,6 +236,100 @@ function SelectButton() {
 ```
 
 You could even go further and have components which accept passing down `animate` props and automatically merging them, like a `Button` which implemented the hovering animation and a `SelectButton` that implemented the `selected`-`unselected` variants and passed those down to `Button`.
+
+## Sprite animations
+
+Sprite animations are similar to (very short and small) videos in that they use rapidly changing frames to simulate a playing video, using a spritesheet. A spritesheet is an image which contains many sprites (which, in the case of sprite animation, act as our frames) in a regular sequence, for example this Mega Man spritesheet: ![A spritesheet containing 10 Mega Man sprites of him running.](assets/megaman-spritesheet.png)
+
+Motion provides you with a hook that can automatically play a sprite animation on an image:
+
+```tsx
+const { rectOffset, rectSize } = useSpritesheet({
+  fps: 23,
+  imageResolution: new Vector2(860, 366),
+  mode: "loop",
+  sprites: 10,
+  spritesPerLine: 5,
+});
+
+return (
+  <imagelabel
+    BackgroundTransparency={1}
+    Image="rbxassetid://2632484460"
+    ImageRectOffset={rectOffset}
+    ImageRectSize={rectSize}
+    Size={UDim2.fromOffset(50, 50)}
+  />
+);
+```
+
+The `mode` argument can be any of `loop`, `playOnce` and `static`:
+
+| Mode | Description |
+| --- | --- |
+| static | Remains on one frame and doesn't change unless frame is manually set using `setFrame`. |
+| playOnce | Plays the sprite animation, doesn't replay after the first iteration. |
+| loop | Plays the sprite animation, replays after each iteration. |
+
+Using this, you can also pause and play sprite animations:
+
+```tsx
+const [mode, setMode] = useState<"loop" | "playOnce" | "static">("static");
+const { rectOffset, rectSize } = useSpritesheet({
+  // `imageResolution`, `sprites` and `spritesPerAxis` defined somewhere already
+  mode,
+});
+
+return (
+  <frame>
+    <imagelabel
+      Image="ASSET_ID_HERE"
+      ImageRectOffset={rectOffset}
+      ImageRectSize={rectSize}
+      Size={UDim2.fromOffset(100, 100)}
+    />
+    <textbutton
+      Event={{
+        Activated: () => setMode(mode === "static" ? "loop" : "static")
+      }}
+      Size={UDim2.fromOffset(100, 100)}
+      Text={mode === "static" ? "Play" : "Pause"}
+    />
+    <uilistlayout />
+  </frame>
+);
+```
+
+See below for a full reference of arguments...
+
+| Argument | Type | Description |
+| --- | --- | --- |
+| fps | `number`, optional, default: `15` | The speed at which your sprite animation is played. |
+| imageResolution | `Vector2`, required | The width and height of your decal. Images beyond 1024x1024 are downscaled; download your asset from the Roblox site to check for the true resolution. |
+| mode | `"static" \| "playOnce" \| "loop"`, optional, default: `"loop"` | The way in which Motion displays your sprite. |
+| range | `[number, number]`, optional | The range of sprites Motion will play through; 0-indexed and inclusive. |
+| sprites | `number`, required | The total number of sprites in your spritesheet. |
+| spritesPerLine | `number`, required | The number of sprites in one line. If `vertical` is `true`, then a line is a column in your spritesheet, otherwise it's a row. |
+| vertical | `boolean`, optional, default: `false` | Whether your sprites are laid out top-to-bottom. |
+
+...and below for a full reference of return values.
+
+| Return value | Type | Description |
+| --- | --- | --- |
+| frame | `number` | The current frame the sprite animation is on. This is just regular React state as returned from `useState`, so it can be passed as a dependency in `useEffect`, `useMemo` etc. |
+| rectOffset | `Vector2` | The current frame translated into an `ImageRectOffset`. You should pass this value as the `ImageRectOffset` prop in your `ImageButton` or your `ImageLabel`.
+| rectSize | `Vector2` | The calculated `ImageRectSize` based on `imageResolution`, `sprites`, `spritesPerLine` and `vertical`. You should pass this value as the `ImageRectSize` prop in your `ImageButton` or your `ImageLabel`. |
+| setFrame | `(frame: number) => void` | The setter for `frame`. This is also just the setter passed from `useState`, and you can use this function to manually set the current frame. |
+
+### Limitations
+
+Motion's implementation of sprite animations does come with downsides, particularly against [SpriteClip](https://devforum.roblox.com/t/spriteclip-sprite-sheet-animation-module/294195?u=onerake), another module which implements sprite animations in Roblox.
+
+In particular, SpriteClip allows you to set offsets between sprites and the border of the image itself, while Motion currently requires there to be no padding or spacing between sprites or the edge of the spritesheet. Say this is your spritesheet: ![A spritesheet with a yellow border around the image and green margins between the sprites. There are 4 sprites: navy blue, white, red, and black.](assets/offset-spritesheet.png)
+
+Here, the yellow represents the border of the image, the green represents the offsets between each of the sprites, and the sprites themselves are blue, white, red and black.
+
+A spritesheet similar to this one would not be supported by Motion. If you have a spritesheet with spacing/padding between sprites and the spritesheet's border and you have no way of eliminating these, then consider using something like SpriteClip instead. You can find a roblox-ts compatible package [here](https://github.com/Firere/SpriteClip).
 
 ## Copy & paste example using `motion` object (works with Hoarcekat)
 
