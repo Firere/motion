@@ -7,7 +7,7 @@ export default ({
 	mode = "loop",
 	range,
 	sprites,
-	spritesPerAxis,
+	spritesPerLine,
 	vertical = false,
 }: {
 	fps?: number;
@@ -15,21 +15,21 @@ export default ({
 	mode?: "static" | "playOnce" | "loop";
 	range?: [number, number];
 	sprites: number;
-	spritesPerAxis: number;
+	spritesPerLine: number;
 	vertical?: boolean;
 }) => {
 	const rectSize = useMemo(
 		() =>
 			vertical
 				? new Vector2(
-						imageResolution.X / math.ceil(sprites / spritesPerAxis),
-						imageResolution.Y / spritesPerAxis,
+						imageResolution.X / math.ceil(sprites / spritesPerLine),
+						imageResolution.Y / spritesPerLine,
 				  )
 				: new Vector2(
-						imageResolution.X / spritesPerAxis,
-						imageResolution.Y / math.ceil(sprites / spritesPerAxis),
+						imageResolution.X / spritesPerLine,
+						imageResolution.Y / math.ceil(sprites / spritesPerLine),
 				  ),
-		[imageResolution, sprites, spritesPerAxis, vertical],
+		[imageResolution, sprites, spritesPerLine, vertical],
 	);
 	const connection = useRef<RBXScriptConnection>();
 	const startFrame = useRef(range ? range[0] : 0);
@@ -43,13 +43,13 @@ export default ({
 
 	const getRectOffset = useCallback(
 		(frame: number) => {
-			const line = math.floor(frame / spritesPerAxis);
-			const positionInLine = frame - line * spritesPerAxis;
+			const line = math.floor(frame / spritesPerLine);
+			const positionInLine = frame - line * spritesPerLine;
 			return vertical
 				? new Vector2(line * rectSize.X, positionInLine * rectSize.Y)
 				: new Vector2(positionInLine * rectSize.X, line * rectSize.Y);
 		},
-		[spritesPerAxis, vertical],
+		[spritesPerLine, vertical],
 	);
 
 	const disconnect = useCallback(() => {
