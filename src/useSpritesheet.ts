@@ -1,4 +1,4 @@
-import React, { useBinding, useCallback, useEffect, useMemo, useRef } from "@rbxts/react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "@rbxts/react";
 import { RunService } from "@rbxts/services";
 
 export default ({
@@ -17,7 +17,7 @@ export default ({
 	sprites: number;
 	spritesPerAxis: number;
 	vertical?: boolean;
-}): [React.Binding<Vector2>, Vector2, (frame: number) => void] => {
+}) => {
 	const rectSize = useMemo(
 		() =>
 			vertical
@@ -31,24 +31,21 @@ export default ({
 				  ),
 		[imageResolution, sprites, spritesPerAxis, vertical],
 	);
-	const [rectOffset, updateRectOffset] = useBinding(new Vector2());
 	const connection = useRef<RBXScriptConnection>();
-	const [startFrame, endFrame] = useMemo(() => range ?? [0, sprites], [range]);
-	const frame = useRef(startFrame);
+	const [startFrame, endFrame] = useMemo(() => range ?? [0, sprites - 1], [range]);
+	const [frame, setFrame] = useState(startFrame);
 
 	const secondsElapsed = useRef(0); // since last frame played
 	const secondsPerFrame = useMemo(() => 1 / fps, [fps]);
 	const shouldReplay = useRef(mode === "loop");
 
-	const setToFrame = useCallback(
+	const getRectOffset = useCallback(
 		(frame: number) => {
 			const line = math.floor(frame / spritesPerAxis);
 			const positionInLine = frame - line * spritesPerAxis;
-			updateRectOffset(
-				vertical
-					? new Vector2(line * rectSize.X, positionInLine * rectSize.Y)
-					: new Vector2(positionInLine * rectSize.X, line * rectSize.Y),
-			);
+			return vertical
+				? new Vector2(line * rectSize.X, positionInLine * rectSize.Y)
+				: new Vector2(positionInLine * rectSize.X, line * rectSize.Y);
 		},
 		[spritesPerAxis, vertical],
 	);
@@ -67,20 +64,17 @@ export default ({
 			secondsElapsed.current += deltaTime;
 
 			while (secondsElapsed.current > secondsPerFrame) {
-				if (frame.current === endFrame)
-					if (!shouldReplay.current) {
+				setFrame((frame) => {
+					if (frame === endFrame) {
+						if (shouldReplay.current) return startFrame;
 						stop();
-						break;
-					} else frame.current = startFrame;
-
-				setToFrame(frame.current);
-				frame.current++;
+						return frame;
+					} else return frame + 1;
+				});
 				secondsElapsed.current -= secondsPerFrame;
 			}
 		});
 	}, []);
-
-	useEffect(() => setToFrame(startFrame), []);
 
 	useEffect(() => {
 		if (mode === "loop" || mode === "playOnce") {
@@ -89,5 +83,5 @@ export default ({
 		} else stop();
 	}, [mode]);
 
-	return [rectOffset, rectSize, setToFrame];
+	return { rectOffset: getRectOffset(frame), rectSize, frame, setFrame };
 };
