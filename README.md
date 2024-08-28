@@ -246,7 +246,7 @@ Motion provides you with a hook that can automatically play a sprite animation o
 ```tsx
 const { rectOffset, rectSize } = useSpritesheet({
   fps: 23,
-  imageResolution: new Vector2(860, 366),
+  imageResolution: new Vector2(860, 270),
   mode: "loop",
   sprites: 10,
   spritesPerLine: 5,
@@ -255,7 +255,7 @@ const { rectOffset, rectSize } = useSpritesheet({
 return (
   <imagelabel
     BackgroundTransparency={1}
-    Image="rbxassetid://2632484460"
+    Image="http://www.roblox.com/asset/?id=133583776880203"
     ImageRectOffset={rectOffset}
     ImageRectSize={rectSize}
     Size={UDim2.fromOffset(50, 50)}
