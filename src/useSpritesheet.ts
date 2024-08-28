@@ -33,6 +33,7 @@ export default ({
 	);
 	const connection = useRef<RBXScriptConnection>();
 	const [startFrame, endFrame] = useMemo(() => range ?? [0, sprites - 1], [range]);
+	// ? the frame is stored as state because there's otherwise no reliable way to return it - this could otherwise be done with a ref and a binding (which would likely be more performant), and I may consider making a separate hook that does that
 	const [frame, setFrame] = useState(startFrame);
 
 	const secondsElapsed = useRef(0); // since last frame played
