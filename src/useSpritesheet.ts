@@ -51,13 +51,13 @@ export default ({
 		[spritesPerAxis, vertical],
 	);
 
-	const stop = useCallback(() => {
+	const disconnect = useCallback(() => {
 		connection.current?.Disconnect();
 		connection.current = undefined;
 		secondsElapsed.current = 0;
 	}, []);
 
-	const start = useCallback(() => {
+	const connect = useCallback(() => {
 		if (connection.current !== undefined) return;
 		secondsElapsed.current = 0;
 
@@ -68,7 +68,7 @@ export default ({
 				setFrame((frame) => {
 					if (frame === endFrame) {
 						if (shouldReplay.current) return startFrame;
-						stop();
+						disconnect();
 						return frame;
 					} else return frame + 1;
 				});
@@ -77,13 +77,13 @@ export default ({
 		});
 	}, []);
 
-	useEffect(() => stop, []);
+	useEffect(() => disconnect, []);
 
 	useEffect(() => {
 		if (mode === "loop" || mode === "playOnce") {
 			shouldReplay.current = mode === "loop";
-			start();
-		} else stop();
+			connect();
+		} else disconnect();
 	}, [mode]);
 
 	return { rectOffset: getRectOffset(frame), rectSize, frame, setFrame };
