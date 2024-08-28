@@ -77,6 +77,8 @@ export default ({
 		});
 	}, []);
 
+	useEffect(() => stop, []);
+
 	useEffect(() => {
 		if (mode === "loop" || mode === "playOnce") {
 			shouldReplay.current = mode === "loop";
