@@ -101,5 +101,5 @@ export default ({
 		});
 	}, [range, sprites]);
 
-	return { rectOffset: getRectOffset(frame), rectSize, frame, setFrame };
+	return { frame, rectOffset: getRectOffset(frame), rectSize, setFrame };
 };
