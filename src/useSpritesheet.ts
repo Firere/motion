@@ -1,15 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "@rbxts/react";
 import { RunService } from "@rbxts/services";
 
-export default ({
-	fps = 15,
-	imageResolution,
-	mode = "loop",
-	range,
-	sprites,
-	spritesPerLine,
-	vertical = false,
-}: {
+export interface SpritesheetArguments {
+	active?: boolean;
 	fps?: number;
 	imageResolution: Vector2;
 	mode?: "static" | "playOnce" | "loop";
@@ -17,7 +10,18 @@ export default ({
 	sprites: number;
 	spritesPerLine: number;
 	vertical?: boolean;
-}) => {
+}
+
+export default ({
+	active = true,
+	fps = 15,
+	imageResolution,
+	mode = "loop",
+	range,
+	sprites,
+	spritesPerLine,
+	vertical = false,
+}: SpritesheetArguments) => {
 	const rectSize = useMemo(
 		() =>
 			vertical
@@ -85,11 +89,13 @@ export default ({
 	}, [fps]);
 
 	useEffect(() => {
+		if (!active) return disconnect();
+
 		if (mode === "loop" || mode === "playOnce") {
 			shouldReplay.current = mode === "loop";
 			connect();
 		} else disconnect();
-	}, [mode]);
+	}, [active, mode]);
 
 	useEffect(() => {
 		startFrame.current = range ? range[0] : 0;
@@ -101,5 +107,10 @@ export default ({
 		});
 	}, [range, sprites]);
 
-	return { frame, rectOffset: getRectOffset(frame), rectSize, setFrame };
+	return {
+		frame,
+		rectOffset: active ? getRectOffset(frame) : new Vector2(),
+		rectSize: active ? rectSize : new Vector2(),
+		setFrame,
+	};
 };

@@ -315,6 +315,7 @@ See below for a full reference of arguments...
 
 | Argument | Type | Description |
 | --- | --- | --- |
+| active | `boolean`, optional, default: `true` | Whether the spritesheet is running. This differs from simply setting `mode` to `static` in that, when `active` is `false`, the hook will return to the default `rectOffset` and `rectSize` and will not manipulate the image in any way; you can think of this as a killswitch for the sprite animation. |
 | fps | `number`, optional, default: `15` | The speed at which your sprite animation is played. |
 | imageResolution | `Vector2`, required | The width and height of your decal. Images beyond 1024x1024 are downscaled; download your asset from the Roblox site to check for the true resolution. |
 | mode | `"static" \| "playOnce" \| "loop"`, optional, default: `"loop"` | The way in which Motion displays your sprite. |
@@ -331,6 +332,10 @@ See below for a full reference of arguments...
 | rectOffset | `Vector2` | The current frame translated into an `ImageRectOffset`. You should pass this value as the `ImageRectOffset` prop in your `ImageButton` or your `ImageLabel`.
 | rectSize | `Vector2` | The calculated `ImageRectSize` based on `imageResolution`, `sprites`, `spritesPerLine` and `vertical`. You should pass this value as the `ImageRectSize` prop in your `ImageButton` or your `ImageLabel`. |
 | setFrame | `(frame: number) => void` | The setter for `frame`. This is also just the setter passed from `useState`, and you can use this function to manually set the current frame. |
+
+### Sprite animations using Motion components
+
+TODO
 
 ### Limitations
 
