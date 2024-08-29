@@ -85,6 +85,12 @@ export default ({
 	useEffect(() => disconnect, []);
 
 	useEffect(() => {
+		if (fps === 0)
+			return warn(
+				'Motion: Cannot set FPS to 0. If you want to pause the sprite animation, then set `mode` to "static"!',
+			);
+		if (fps < 0) return warn("Motion: FPS must not be negative."); // todo: make negative FPS play in reverse
+
 		secondsPerFrame.current = 1 / fps;
 	}, [fps]);
 
