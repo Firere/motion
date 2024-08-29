@@ -7,7 +7,15 @@ export type BezierArguments = [x1: number, y1: number, x2: number, y2: number];
 
 export interface Transition {
 	duration?: number;
+	// `easingStyle` and `easingDirection` are essentially obsolete given `easingFunction`
+	// is much shorter and can do the same thing, so they've been deprecated
+	/**
+	 * @deprecated `easingStyle` and `easingDirection` have been deprecated in favour of `easingFunction`.
+	 */
 	easingStyle?: Enum.EasingStyle | (CastsToEnum<Enum.EasingStyle> & string);
+	/**
+	 * @deprecated `easingStyle` and `easingDirection` have been deprecated in favour of `easingFunction`.
+	 */
 	easingDirection?: Enum.EasingDirection | (CastsToEnum<Enum.EasingDirection> & string);
 	easingFunction?: BezierArguments | Easing;
 	reverses?: boolean;

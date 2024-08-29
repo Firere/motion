@@ -34,7 +34,7 @@ When the `animate` prop changes, Motion will automatically generate an animation
 
 ## Transitions
 
-A transition defines how values animate from one state to another. If you've ever used tweens in Roblox before, then it's the same as using `TweenInfo`:
+A transition defines how values animate from one state to another. If you've ever used tweens in Roblox before, then it's very similar to using `TweenInfo`:
 
 ```tsx
 const [size, setSize] = useState(UDim2.fromOffset(200, 50));
@@ -50,8 +50,7 @@ return (
     transition={{
       // each of these are also their respective defaults
       duration: 1,
-      easingStyle: Enum.EasingStyle.Linear,
-      easingDirection: "InOut", // strings can be casted to enums for convenience
+      easingFunction: "linear",
       repeatCount: 0, // -1 for infinity
       reverse: false,
       delay: 0,
@@ -60,7 +59,7 @@ return (
 );
 ```
 
-Additionally, Motion allows you to use cubic Bézier easing functions, [similarly to how you would in CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function#cubic-bezier-easing-function):
+Additionally, Motion allows you to pass cubic Bézier easing functions, [similarly to how you would in CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function#cubic-bezier-easing-function):
 
 ```tsx
 const [size, setSize] = useState(UDim2.fromOffset(200, 50));
@@ -98,27 +97,7 @@ transition={{
 ```
 
 >[!NOTE]
->Since all easings from easings.net are built into tweens on Roblox natively, Motion will automatically resort to using a regular Roblox tween. So the above `transition` is functionally equivalent to:
->```
->transition={{
->   easingStyle: "Quint",
->   easingDirection: "Out",
->}}
->```
->In fact, Motion actively looks to see if a provided `easingFunction` can in some way be translated into a native tween. So even if you write...
->```
->transition={{
->   easingFunction: [0.22, 1, 0.36, 1],
->}}
->```
->...it will still convert this to a native `easeOutQuint`.
->
->Motion does this because regular tweens are directly built into Roblox's engine, and so run native code. Bézier tweens, however, are interpreted by the Lua VM, and so are much less performant.
->
->If it is unable to find an equivalent native tween, then a Bézier tween will be used.
-
->[!WARNING]
->Bézier tweens are experimental and unlikely to behave exactly as regular tweens, though they aim to do so. Expect bugs, strange behaviour and potentially suboptimal performance.
+>Since all easings from easings.net (along with `linear`) are built into tweens on Roblox natively, Motion will automatically resort to using a native Roblox tween for performance and stability. You can still use custom Bézier tweens, of course, but keep in mind they may act unexpectedly or with suboptimal performance.
 
 ## The `initial` prop
 
@@ -199,8 +178,7 @@ const buttonVariants = {
     TextColor3: new Color3(0, 1, 0),
     transition={{ 
       duration: 20,
-      easingStyle: "Elastic", // overrides Quint
-      easingDirection: "Out",
+      easingFunction: "easeOutElastic", // overrides `easeInOutQuint`
       reverses: true, // unique to the `hover` variant
     }}
   },
@@ -208,8 +186,7 @@ const buttonVariants = {
     TextColor3: new Color3(1, 1, 1),
     transition={{ 
       duration: 1, // overrides 20
-      easingStyle: "Quad", // overrides Quint
-      easingDirection: "In", // unique to the `default` variant
+      easingFunction: "easeInQuad", // overrides `easeInOutQuint`
       repeatCount: 2, // unique to the `default` variant
     }}
   },
@@ -220,7 +197,7 @@ return (
     animate={state}
     transition={{
       duration: 20,
-      easingStyle: "Quint",
+      easingFunction: "easeInOutQuint",
       delay: 0.5, // gets added to all variants
     }}
     Event={{
@@ -435,7 +412,7 @@ const [variant, setVariant] = useAnimation(ref, {
   initial: "default",
   transition: {
     duration: 3,
-    easingStyle: "Quad",
+    easingFunction: "easeInOutQuad",
   },
   variants: {
     hover: {

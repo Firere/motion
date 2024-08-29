@@ -87,6 +87,9 @@ function tween<T extends Instance>(instance: T, animations: TargetAndTransition<
 				),
 			);
 
+		// ! the README lies: `easingFunction` is `undefined` by default, not `linear`
+		// this is done to avoid introducing new users to `easingStyle` and `easingDirection`,
+		// which have been deprecated, but also to keep legacy code working
 		if (transition?.easingFunction !== undefined) {
 			if (typeIs(transition.easingFunction, "string")) {
 				const easing = easings[transition.easingFunction];
@@ -113,7 +116,7 @@ function tween<T extends Instance>(instance: T, animations: TargetAndTransition<
 				if (!foundNativeEquivalent) createBezier(transition.easingFunction);
 			}
 		}
-		// ! legacy behaviour
+		// ! legacy
 		else
 			createNative(
 				new TweenInfo(
