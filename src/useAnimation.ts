@@ -2,8 +2,9 @@ import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import type { AnimationProps, CastsToTarget, TargetAndTransition, Transition } from ".";
+import type { AnimationProps, BezierArguments, CastsToTarget, TargetAndTransition, Transition } from ".";
 import BezierTween from "./bezier-tween/src";
+import easings from "./easings";
 
 function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: string) {
 	assert(variants, `Variant "${variant}" cannot be set because no variants have been set`);
@@ -69,35 +70,63 @@ function tween<T extends Instance>(instance: T, animations: TargetAndTransition<
 		const { transition } = animation;
 		const properties: Partial<Extract<T, Tweenable>> = {};
 		applyTarget(animation, properties);
+		const createNative = (tweenInfo: TweenInfo) =>
+			tweens.push(TweenService.Create(instance, tweenInfo, properties));
+		const createBezier = (easingFunction: BezierArguments) =>
+			tweens.push(
+				new BezierTween(
+					instance,
+					{
+						time: transition?.duration,
+						bezier: easingFunction,
+						repeatCount: transition?.repeatCount,
+						reverses: transition?.reverses,
+						delayTime: transition?.delay,
+					},
+					properties,
+				),
+			);
 
-		tweens.push(
-			transition?.easingFunction === undefined
-				? TweenService.Create(
-						instance,
-						new TweenInfo(
-							transition?.duration ?? 1,
-							(castToEnum(Enum.EasingStyle, transition?.easingStyle) as Enum.EasingStyle) ??
-								Enum.EasingStyle.Linear,
-							(castToEnum(Enum.EasingDirection, transition?.easingDirection) as Enum.EasingDirection) ??
-								Enum.EasingDirection.InOut,
-							transition?.repeatCount ?? 0,
-							transition?.reverses ?? false,
-							transition?.delay ?? 0,
-						),
-						properties,
-				  )
-				: new BezierTween(
-						instance,
-						{
-							time: transition.duration,
-							bezier: transition.easingFunction,
-							repeatCount: transition.repeatCount,
-							reverses: transition.reverses,
-							delayTime: transition.delay,
-						},
-						properties,
-				  ),
-		);
+		if (transition?.easingFunction !== undefined) {
+			if (typeIs(transition.easingFunction, "string")) {
+				const easing = easings[transition.easingFunction];
+				if (easing[1]) {
+					createNative(
+						easing[1](transition.duration, transition.repeatCount, transition.reverses, transition.delay),
+					);
+				} else createBezier(easing[0]);
+			} else {
+				// it's preferable to use a native tween, so we search through easings to see
+				// if the provided easing function has a native equivalent and use that instead
+				let foundNativeEquivalent = false;
+				// eslint-disable-next-line
+				for (const [_, [easingFunction, native]] of ipairs(Object.values(easings))) {
+					if (easingFunction && native && Object.deepEquals(transition.easingFunction, easingFunction)) {
+						createNative(
+							native(transition.duration, transition.repeatCount, transition.reverses, transition.delay),
+						);
+						foundNativeEquivalent = true;
+						break;
+					}
+				}
+
+				if (!foundNativeEquivalent) createBezier(transition.easingFunction);
+			}
+		}
+		// ! legacy behaviour
+		else
+			createNative(
+				new TweenInfo(
+					transition?.duration ?? 1,
+					(castToEnum(Enum.EasingStyle, transition?.easingStyle) as Enum.EasingStyle) ??
+						Enum.EasingStyle.Linear,
+					(castToEnum(Enum.EasingDirection, transition?.easingDirection) as Enum.EasingDirection) ??
+						Enum.EasingDirection.InOut,
+					transition?.repeatCount ?? 0,
+					transition?.reverses ?? false,
+					transition?.delay ?? 0,
+				),
+			);
 	});
 
 	tweens.forEach((tween) => (tween as Tween).Play()); // TS complains if I don't do this stupid type assertion

@@ -1,12 +1,15 @@
+import type { Easing } from "./easings";
 import { createMotionComponent, motion } from "./motion";
 import useAnimation from "./useAnimation";
 import useSpritesheet from "./useSpritesheet";
+
+export type BezierArguments = [x1: number, y1: number, x2: number, y2: number];
 
 export interface Transition {
 	duration?: number;
 	easingStyle?: Enum.EasingStyle | (CastsToEnum<Enum.EasingStyle> & string);
 	easingDirection?: Enum.EasingDirection | (CastsToEnum<Enum.EasingDirection> & string);
-	easingFunction?: [x1: number, y1: number, x2: number, y2: number];
+	easingFunction?: BezierArguments | Easing;
 	reverses?: boolean;
 	repeatCount?: number;
 	delay?: number;

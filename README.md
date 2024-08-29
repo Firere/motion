@@ -81,10 +81,44 @@ return (
 );
 ```
 
-If you define `easingFunction`, then `easingDirection` and `easingStyle` will have no effect, and a Bézier tween will be used instead of a native Roblox tween.
+You're also free to just write the easings built-in to the web...
+
+```
+transition={{
+  easingFunction: "ease", // or "easeIn", "easeInOut" and "linear"
+}}
+```
+
+...or those found on [easings.net](https://easings.net/).
+
+```
+transition={{
+  easingFunction: "easeOutQuint",
+}}
+```
+
+>[!NOTE]
+>Since all easings from easings.net are built into tweens on Roblox natively, Motion will automatically resort to using a regular Roblox tween. So the above `transition` is functionally equivalent to:
+>```
+>transition={{
+>   easingStyle: "Quint",
+>   easingDirection: "Out",
+>}}
+>```
+>In fact, Motion actively looks to see if a provided `easingFunction` can in some way be translated into a native tween. So even if you write...
+>```
+>transition={{
+>   easingFunction: [0.22, 1, 0.36, 1],
+>}}
+>```
+>...it will still convert this to a native `easeOutQuint`.
+>
+>Motion does this because regular tweens are directly built into Roblox's engine, and so run native code. Bézier tweens, however, are interpreted by the Lua VM, and so are much less performant.
+>
+>If it is unable to find an equivalent native tween, then a Bézier tween will be used.
 
 >[!WARNING]
->Bézier tweens are experimental and unlikely to behave exactly as regular tweens, though they aim to do so. Expect bugs and strange behaviour.
+>Bézier tweens are experimental and unlikely to behave exactly as regular tweens, though they aim to do so. Expect bugs, strange behaviour and potentially suboptimal performance.
 
 ## The `initial` prop
 
