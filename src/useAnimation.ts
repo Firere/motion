@@ -2,7 +2,7 @@ import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import type { AnimationProps, BezierArguments, CastsToTarget, TargetAndTransition, Transition } from ".";
+import type { AnimationProps, BezierArguments, CastsToTarget, Target, Transition } from ".";
 import BezierTween from "./bezier-tween/src";
 import easings from "./easings";
 
@@ -19,7 +19,7 @@ function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"],
 
 function addDefaultTransition<T extends Instance>(
 	variants: AnimationProps<T>["variants"],
-	animation: string | TargetAndTransition<T>,
+	animation: string | Target<T>,
 	transition?: Transition,
 ) {
 	const targetAndTransition = typeIs(animation, "string") ? getVariant(variants, animation) : animation;
@@ -51,7 +51,7 @@ function castToTargetsAndTransitions<T extends Instance>(
 	return [addDefaultTransition(variants, animations, transition)];
 }
 
-function applyTarget<T extends Instance>(toCopy: TargetAndTransition<T>, applyOn: object) {
+function applyTarget<T extends Instance>(toCopy: Target<T>, applyOn: object) {
 	for (const [key, value] of pairs(toCopy as object))
 		if (key !== "transition") applyOn[key as never] = value as never;
 }
@@ -63,7 +63,7 @@ const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
 	enumItem: EnumItem | K | undefined,
 ) => (typeIs(enumItem, "string") ? enumObject[enumItem] : enumItem);
 
-function tween<T extends Instance>(instance: T, animations: TargetAndTransition<T>[]) {
+function tween<T extends Instance>(instance: T, animations: Target<T>[]) {
 	const tweens: (BezierTween<T> | Tween)[] = [];
 
 	animations.forEach((animation) => {
@@ -141,8 +141,7 @@ export default function <T extends Instance>(
 	{ animate, initial, transition, variants }: AnimationProps<T>,
 ): [string, (variant: string) => void] {
 	const [variantState, setVariantState] = useState<CastsToTarget<T>>();
-	const currentAnimations: TargetAndTransition<T>[] =
-		castToTargetsAndTransitions(variants, variantState, transition) ?? [];
+	const currentAnimations: Target<T>[] = castToTargetsAndTransitions(variants, variantState, transition) ?? [];
 	/**
 	 * ? variantState is overridden by the `animate` prop,
 	 * which in effect makes `setVariant` in a normal use of

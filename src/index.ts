@@ -23,20 +23,20 @@ export interface Transition {
 	delay?: number;
 }
 
-export type Target<T extends Instance> = Partial<ExtractMembers<T, Tweenable>>;
-
-export type TargetAndTransition<T extends Instance> = Target<T> & {
+export type Target<T extends Instance> = Partial<ExtractMembers<T, Tweenable>> & {
 	transition?: Transition;
 };
 
-export type Variants<T extends Instance> = Record<string, TargetAndTransition<T>>;
+/**
+ * @deprecated `TargetAndTransition` has been renamed to `Target` to refine Motion's concepts. If you need the type that was previously `Target`, it is simply `Partial<ExtractMembers<T, Tweenable>>`.
+ */
+export type TargetAndTransition<T extends Instance> = Target<T>;
+
+export type Variants<T extends Instance> = Record<string, Target<T>>;
 
 export type VariantLabel = string;
 
-export type CastsToTarget<T extends Instance> =
-	| TargetAndTransition<T>
-	| VariantLabel
-	| (TargetAndTransition<T> | VariantLabel)[];
+export type CastsToTarget<T extends Instance> = Target<T> | VariantLabel | (Target<T> | VariantLabel)[];
 
 export interface AnimationProps<T extends Instance> {
 	animate?: CastsToTarget<T>;
