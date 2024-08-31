@@ -1,9 +1,9 @@
-import Bezier from "@rbxts/cubic-bezier";
 import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import type { AnimationProps, BezierArguments, CastsToTarget, Target, Transition, VariantLabel } from ".";
+import Bezier from "./cubic-bezier";
 import CustomTween, { EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
 
