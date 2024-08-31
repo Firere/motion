@@ -3,11 +3,11 @@ import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import type { AnimationProps, BezierArguments, CastsToTarget, Target, Transition } from ".";
+import type { AnimationProps, BezierArguments, CastsToTarget, Target, Transition, VariantLabel } from ".";
 import CustomTween, { EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
 
-function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: string) {
+function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: VariantLabel) {
 	assert(variants, `Variant "${variant}" cannot be set because no variants have been set`);
 	assert(
 		variant in variants,
@@ -20,23 +20,23 @@ function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"],
 
 function addDefaultTransition<T extends Instance>(
 	variants: AnimationProps<T>["variants"],
-	animation: string | Target<T>,
+	target: VariantLabel | Target<T>,
 	transition?: Transition,
 ) {
-	const targetAndTransition = typeIs(animation, "string") ? getVariant(variants, animation) : animation;
-	return { ...targetAndTransition, transition: { ...transition, ...targetAndTransition.transition } };
+	const casted = typeIs(target, "string") ? getVariant(variants, target) : target;
+	return { ...casted, transition: { ...transition, ...casted.transition } };
 }
 
-function castToTargetsAndTransitions<T extends Instance>(
+function castToTargets<T extends Instance>(
 	variants: AnimationProps<T>["variants"],
-	animations: CastsToTarget<T> | undefined,
+	targets: CastsToTarget<T> | undefined,
 	transition?: Transition,
 ) {
-	if (animations === undefined) return undefined;
-	if (t.array(t.union(t.string, t.table))(animations)) {
-		const casted = animations.map((animation) => addDefaultTransition(variants, animation, transition));
+	if (targets === undefined) return undefined;
+	if (t.array(t.union(t.string, t.table))(targets)) {
+		const casted = targets.map((target) => addDefaultTransition(variants, target, transition));
 
-		// some animations may apply to the same property, resulting in multiple
+		// some targets may contain the same property, resulting in multiple
 		// Tweens potentially messing with it, so all conflicts are handled here
 		const alreadyModified = new Set<keyof Partial<Extract<T, Tweenable>>>();
 		for (let i = casted.size() - 1; i >= 0; i--)
@@ -49,10 +49,10 @@ function castToTargetsAndTransitions<T extends Instance>(
 
 		return casted;
 	}
-	return [addDefaultTransition(variants, animations, transition)];
+	return [addDefaultTransition(variants, targets, transition)];
 }
 
-function applyTarget<T extends Instance>(toCopy: Target<T>, applyOn: object) {
+function removeTransition<T extends Instance>(toCopy: Target<T>, applyOn: object) {
 	for (const [key, value] of pairs(toCopy as object))
 		if (key !== "transition") applyOn[key as never] = value as never;
 }
@@ -64,13 +64,13 @@ const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
 	enumItem: EnumItem | K | undefined,
 ) => (typeIs(enumItem, "string") ? enumObject[enumItem] : enumItem);
 
-function tween<T extends Instance>(instance: T, animations: Target<T>[]) {
+function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: (Tween | CustomTween<T>)[] = [];
 
-	animations.forEach((animation) => {
-		const { transition } = animation;
+	targets.forEach((target) => {
+		const { transition } = target;
 		const properties: Partial<Extract<T, Tweenable>> = {};
-		applyTarget(animation, properties);
+		removeTransition(target, properties);
 		const createNative = (tweenInfo: TweenInfo) =>
 			tweens.push(TweenService.Create(instance, tweenInfo, properties));
 		const createCustom = (easing: EasingFunction) =>
@@ -155,14 +155,14 @@ export default function <T extends Instance>(
 	{ animate, initial, transition, variants }: AnimationProps<T>,
 ): [string, (variant: string) => void] {
 	const [variantState, setVariantState] = useState<CastsToTarget<T>>();
-	const currentAnimations: Target<T>[] = castToTargetsAndTransitions(variants, variantState, transition) ?? [];
+	const currentTargets: Target<T>[] = castToTargets(variants, variantState, transition) ?? [];
 	/**
 	 * ? variantState is overridden by the `animate` prop,
 	 * which in effect makes `setVariant` in a normal use of
 	 * useAnimation useless if `animate` is defined. rethink
 	 * how this is implemented, maybe?
 	 */
-	const animations = castToTargetsAndTransitions(variants, animate, transition) ?? currentAnimations;
+	const targets = castToTargets(variants, animate, transition) ?? currentTargets;
 
 	// initial
 	useEffect(() => {
@@ -172,18 +172,18 @@ export default function <T extends Instance>(
 		initial ??= true;
 		if (typeIs(initial, "boolean")) {
 			if (initial) {
-				tween(element, animations);
+				tween(element, targets);
 			} else {
-				animations.forEach((animation) => applyTarget(animation, element));
+				targets.forEach((target) => removeTransition(target, element));
 			}
 			return;
 		}
 
-		applyTarget(
-			castToTargetsAndTransitions(variants, initial, {})!.reduce(
-				(accumulator, targetAndTransition) => ({
+		removeTransition(
+			castToTargets(variants, initial, {})!.reduce(
+				(accumulator, target) => ({
 					...accumulator,
-					...targetAndTransition,
+					...target,
 				}),
 				{},
 			),
@@ -193,7 +193,7 @@ export default function <T extends Instance>(
 
 	// animate
 	useEffect(() => {
-		if (ref.current !== undefined) return tween(ref.current, animations);
+		if (ref.current !== undefined) return tween(ref.current, targets);
 	}, [ref, variants, variantState, animate, transition]);
 
 	return [typeIs(variantState, "string") ? variantState : "", setVariantState];
