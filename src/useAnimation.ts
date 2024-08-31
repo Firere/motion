@@ -69,8 +69,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 
 	targets.forEach((target) => {
 		const { transition } = target;
-		const properties: Partial<Extract<T, Tweenable>> = {};
-		removeTransition(target, properties);
+		const properties = { ...target, transition: undefined };
 		const createNative = (tweenInfo: TweenInfo) =>
 			tweens.push(TweenService.Create(instance, tweenInfo, properties));
 		const createCustom = (easing: EasingFunction) =>
