@@ -1,9 +1,10 @@
+import Bezier from "@rbxts/cubic-bezier";
 import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import type { AnimationProps, BezierArguments, CastsToTarget, Target, Transition } from ".";
-import BezierTween from "./bezier-tween/src";
+import CustomTween, { EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
 
 function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: string) {
@@ -64,7 +65,7 @@ const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
 ) => (typeIs(enumItem, "string") ? enumObject[enumItem] : enumItem);
 
 function tween<T extends Instance>(instance: T, animations: Target<T>[]) {
-	const tweens: (BezierTween<T> | Tween)[] = [];
+	const tweens: (Tween | CustomTween<T>)[] = [];
 
 	animations.forEach((animation) => {
 		const { transition } = animation;
@@ -72,13 +73,13 @@ function tween<T extends Instance>(instance: T, animations: Target<T>[]) {
 		applyTarget(animation, properties);
 		const createNative = (tweenInfo: TweenInfo) =>
 			tweens.push(TweenService.Create(instance, tweenInfo, properties));
-		const createBezier = (easingFunction: BezierArguments) =>
+		const createCustom = (easing: EasingFunction) =>
 			tweens.push(
-				new BezierTween(
+				new CustomTween(
 					instance,
 					{
 						time: transition?.duration,
-						bezier: easingFunction,
+						easing,
 						repeatCount: transition?.repeatCount,
 						reverses: transition?.reverses,
 						delayTime: transition?.delay,
@@ -86,35 +87,48 @@ function tween<T extends Instance>(instance: T, animations: Target<T>[]) {
 					properties,
 				),
 			);
+		const createBezier = (bezierArguments: BezierArguments) => createCustom(new Bezier(...bezierArguments));
 
-		// ! the README lies: `easingFunction` is `undefined` by default, not `linear`
-		// this is done to avoid introducing new users to `easingStyle` and `easingDirection`,
-		// which have been deprecated, but also to keep legacy code working
-		if (transition?.easingFunction !== undefined) {
-			if (typeIs(transition.easingFunction, "string")) {
-				const easing = easings[transition.easingFunction];
-				if (easing[1]) {
+		const easing = transition?.easing ?? transition?.easingFunction;
+
+		// ! the README lies: `easing` is `undefined` by default, not `linear`
+		// this is done to avoid exposing new users to the deprecated `easingStyle`,
+		// `easingDirection` and `easingFunction`, but also to keep legacy code working
+		if (easing !== undefined) {
+			if (typeIs(easing, "string")) {
+				const preset = easings[easing];
+				if (preset[1]) {
 					createNative(
-						easing[1](transition.duration, transition.repeatCount, transition.reverses, transition.delay),
+						preset[1](
+							transition?.duration,
+							transition?.repeatCount,
+							transition?.reverses,
+							transition?.delay,
+						),
 					);
-				} else createBezier(easing[0]);
-			} else {
+				} else createBezier(preset[0]);
+			} else if (t.array(t.number)(easing)) {
 				// it's preferable to use a native tween, so we search through easings to see
 				// if the provided easing function has a native equivalent and use that instead
 				let foundNativeEquivalent = false;
 				// eslint-disable-next-line
 				for (const [_, [easingFunction, native]] of ipairs(Object.values(easings))) {
-					if (easingFunction && native && Object.deepEquals(transition.easingFunction, easingFunction)) {
+					if (easingFunction && native && Object.deepEquals(easing, easingFunction)) {
 						createNative(
-							native(transition.duration, transition.repeatCount, transition.reverses, transition.delay),
+							native(
+								transition?.duration,
+								transition?.repeatCount,
+								transition?.reverses,
+								transition?.delay,
+							),
 						);
 						foundNativeEquivalent = true;
 						break;
 					}
 				}
 
-				if (!foundNativeEquivalent) createBezier(transition.easingFunction);
-			}
+				if (!foundNativeEquivalent) createBezier(easing);
+			} else createCustom(easing);
 		}
 		// ! legacy
 		else
