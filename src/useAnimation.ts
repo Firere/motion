@@ -164,6 +164,7 @@ export default function <T extends Instance>(
 	const targets = castToTargets(variants, animate, transition) ?? currentTargets;
 
 	// initial
+	let initialTweenDestructor: (() => void) | undefined;
 	useEffect(() => {
 		const element = ref.current;
 		if (element === undefined) return;
@@ -171,7 +172,7 @@ export default function <T extends Instance>(
 		initial ??= true;
 		if (typeIs(initial, "boolean")) {
 			if (initial) {
-				tween(element, targets);
+				initialTweenDestructor = tween(element, targets);
 			} else {
 				targets.forEach((target) => removeTransition(target, element));
 			}
@@ -192,7 +193,10 @@ export default function <T extends Instance>(
 
 	// animate
 	useEffect(() => {
-		if (ref.current !== undefined) return tween(ref.current, targets);
+		if (ref.current !== undefined) {
+			initialTweenDestructor?.();
+			return tween(ref.current, targets);
+		}
 	}, [ref, variants, variantState, animate, transition]);
 
 	return [typeIs(variantState, "string") ? variantState : "", setVariantState];
