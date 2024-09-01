@@ -155,13 +155,7 @@ export default function <T extends Instance>(
 		};
 
 		initial ??= true;
-		if (typeIs(initial, "boolean")) {
-			if (initial) {
-				initialTweenDestructor = tween(element, targets);
-			} else {
-				targets.forEach(applyProperties);
-			}
-		} else
+		if (!typeIs(initial, "boolean")) {
 			applyProperties(
 				castToTargets(variants, initial, {})!.reduce(
 					(accumulator, target) => ({
@@ -171,6 +165,11 @@ export default function <T extends Instance>(
 					{},
 				),
 			);
+		} else if (initial) {
+			initialTweenDestructor = tween(element, targets);
+		} else {
+			targets.forEach(applyProperties);
+		}
 	}, []);
 
 	// animate
