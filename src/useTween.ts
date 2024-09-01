@@ -75,8 +75,12 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			transition;
 
 		const properties = { ...target, transition: undefined };
-		const createNative = (tweenInfo: TweenInfo) => {
-			const tween = TweenService.Create(instance, tweenInfo, properties);
+		const createNative = (style: Enum.EasingStyle, direction: Enum.EasingDirection) => {
+			const tween = TweenService.Create(
+				instance,
+				new TweenInfo(duration ?? 1, style, direction, repeatCount ?? 0, reverses ?? false, delay ?? 0),
+				properties,
+			);
 			tweens.push({ tween, callback });
 			if (callback) tween.Completed.Connect(callback);
 		};
@@ -96,9 +100,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		if (ease !== undefined) {
 			if (typeIs(ease, "string")) {
 				const preset = easings[ease];
-				if (preset[1]) {
-					createNative(preset[1](duration, repeatCount, reverses, delay));
-				} else createBezier(preset[0]);
+				preset[1] ? createNative(...preset[1]) : createBezier(preset[0]);
 			} else if (t.array(t.number)(ease)) {
 				// it's preferable to use a native tween, so we search through easings to see
 				// if the provided easing function has a native equivalent and use that instead
@@ -106,7 +108,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				// eslint-disable-next-line
 				for (const [_, [easingFunction, native]] of ipairs(Object.values(easings))) {
 					if (easingFunction && native && Object.deepEquals(ease, easingFunction)) {
-						createNative(native(duration, repeatCount, reverses, delay));
+						createNative(...native);
 						foundNativeEquivalent = true;
 						break;
 					}
@@ -118,15 +120,9 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		// ! legacy
 		else
 			createNative(
-				new TweenInfo(
-					duration ?? 1,
-					(castToEnum(Enum.EasingStyle, easingStyle) as Enum.EasingStyle) ?? Enum.EasingStyle.Linear,
-					(castToEnum(Enum.EasingDirection, easingDirection) as Enum.EasingDirection) ??
-						Enum.EasingDirection.InOut,
-					repeatCount ?? 0,
-					reverses ?? false,
-					delay ?? 0,
-				),
+				(castToEnum(Enum.EasingStyle, easingStyle) as Enum.EasingStyle) ?? Enum.EasingStyle.Linear,
+				(castToEnum(Enum.EasingDirection, easingDirection) as Enum.EasingDirection) ??
+					Enum.EasingDirection.InOut,
 			);
 	});
 

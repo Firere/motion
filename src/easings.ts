@@ -37,20 +37,14 @@ export type Easing =
 	| "easeOutBounce"
 	| "easeInOutBounce";
 
-const createCaster =
-	(
-		easingDirection: CastsToEnum<Enum.EasingDirection> & string,
-		easingStyle: CastsToEnum<Enum.EasingStyle> & string,
-	) =>
-	(time?: number, repeatCount?: number, reverses?: boolean, delayTime?: number) =>
-		new TweenInfo(
-			time,
-			Enum.EasingStyle[easingStyle as never],
-			Enum.EasingDirection[easingDirection as never],
-			repeatCount ?? 0,
-			reverses ?? false,
-			delayTime ?? 0,
-		);
+const createCaster = (
+	easingDirection: CastsToEnum<Enum.EasingDirection> & string,
+	easingStyle: CastsToEnum<Enum.EasingStyle> & string,
+) =>
+	[Enum.EasingStyle[easingStyle as never], Enum.EasingDirection[easingDirection as never]] as [
+		Enum.EasingStyle,
+		Enum.EasingDirection,
+	];
 
 const easings: Record<
 	Easing,
