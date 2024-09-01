@@ -2,12 +2,12 @@ import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import type { AnimationProps, BezierArguments, CastsToTarget, Target, Transition, VariantLabel } from ".";
+import type { AnimationProps, BezierArguments, CastsToTarget, Target, Transition, Variant } from ".";
 import Bezier from "./cubic-bezier";
 import CustomTween, { EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
 
-function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: VariantLabel) {
+function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: Variant) {
 	assert(variants, `Variant "${variant}" cannot be set because no variants have been set`);
 	assert(
 		variant in variants,
@@ -20,7 +20,7 @@ function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"],
 
 function addDefaultTransition<T extends Instance>(
 	variants: AnimationProps<T>["variants"],
-	target: VariantLabel | Target<T>,
+	target: Variant | Target<T>,
 	transition?: Transition,
 ) {
 	const casted = typeIs(target, "string") ? getVariant(variants, target) : target;

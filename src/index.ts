@@ -34,11 +34,16 @@ export type Target<T extends Instance> = Partial<ExtractMembers<T, Tweenable>> &
  */
 export type TargetAndTransition<T extends Instance> = Target<T>;
 
-export type Variants<T extends Instance> = Record<string, Target<T>>;
+export type Variant = string;
 
+/**
+ * @deprecated in favour of `Variant`
+ */
 export type VariantLabel = string;
 
-export type CastsToTarget<T extends Instance> = Target<T> | VariantLabel | (Target<T> | VariantLabel)[];
+export type Variants<T extends Instance> = Record<Variant, Target<T>>;
+
+export type CastsToTarget<T extends Instance> = Target<T> | Variant | (Target<T> | Variant)[];
 
 export interface AnimationProps<T extends Instance> {
 	animate?: CastsToTarget<T>;
