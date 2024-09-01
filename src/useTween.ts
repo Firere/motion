@@ -94,9 +94,6 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 
 		const ease = transition?.ease ?? transition?.easingFunction;
 
-		// ! the README lies: `easing` is `undefined` by default, not `linear`
-		// this is done to avoid exposing new users to the deprecated `easingStyle`,
-		// `easingDirection` and `easingFunction`, but also to keep legacy code working
 		if (ease !== undefined) {
 			if (typeIs(ease, "string")) {
 				const preset = easings[ease];
