@@ -68,44 +68,43 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = [];
 
 	targets.forEach((target) => {
-		const { transition } = target;
+		let transition = target.transition;
+		// explicitly defines defaults in case either `Tween` or `CustomTween` change their own defaults
+		transition ??= { duration: 1, ease: "linear", repeatCount: 0, reverses: false, delay: 0 };
+		const { duration, easingStyle, easingDirection, easingFunction, repeatCount, reverses, delay, callback } =
+			transition;
+
 		const properties = { ...target, transition: undefined };
 		const createNative = (tweenInfo: TweenInfo) => {
 			const tween = TweenService.Create(instance, tweenInfo, properties);
-			tweens.push({ tween, callback: transition?.callback });
-			if (transition?.callback) tween.Completed.Connect(transition.callback);
+			tweens.push({ tween, callback });
+			if (callback) tween.Completed.Connect(callback);
 		};
 		const createCustom = (easing: EasingFunction) =>
 			tweens.push({
 				tween: new CustomTween(
 					instance,
 					{
-						time: transition?.duration,
+						time: duration,
 						easing,
-						repeatCount: transition?.repeatCount,
-						reverses: transition?.reverses,
-						delayTime: transition?.delay,
-						callback: transition?.callback,
+						repeatCount,
+						reverses,
+						delayTime: delay,
+						callback,
 					},
 					properties,
 				),
 			});
 		const createBezier = (bezierArguments: BezierDefinition) => createCustom(new Bezier(...bezierArguments));
 
-		const ease = transition?.ease ?? transition?.easingFunction;
+		let ease = transition.ease ?? easingFunction;
+		if (easingStyle === undefined && easingDirection === undefined) ease ??= "linear";
 
 		if (ease !== undefined) {
 			if (typeIs(ease, "string")) {
 				const preset = easings[ease];
 				if (preset[1]) {
-					createNative(
-						preset[1](
-							transition?.duration,
-							transition?.repeatCount,
-							transition?.reverses,
-							transition?.delay,
-						),
-					);
+					createNative(preset[1](duration, repeatCount, reverses, delay));
 				} else createBezier(preset[0]);
 			} else if (t.array(t.number)(ease)) {
 				// it's preferable to use a native tween, so we search through easings to see
@@ -114,14 +113,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				// eslint-disable-next-line
 				for (const [_, [easingFunction, native]] of ipairs(Object.values(easings))) {
 					if (easingFunction && native && Object.deepEquals(ease, easingFunction)) {
-						createNative(
-							native(
-								transition?.duration,
-								transition?.repeatCount,
-								transition?.reverses,
-								transition?.delay,
-							),
-						);
+						createNative(native(duration, repeatCount, reverses, delay));
 						foundNativeEquivalent = true;
 						break;
 					}
@@ -134,14 +126,13 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		else
 			createNative(
 				new TweenInfo(
-					transition?.duration ?? 1,
-					(castToEnum(Enum.EasingStyle, transition?.easingStyle) as Enum.EasingStyle) ??
-						Enum.EasingStyle.Linear,
-					(castToEnum(Enum.EasingDirection, transition?.easingDirection) as Enum.EasingDirection) ??
+					duration ?? 1,
+					(castToEnum(Enum.EasingStyle, easingStyle) as Enum.EasingStyle) ?? Enum.EasingStyle.Linear,
+					(castToEnum(Enum.EasingDirection, easingDirection) as Enum.EasingDirection) ??
 						Enum.EasingDirection.InOut,
-					transition?.repeatCount ?? 0,
-					transition?.reverses ?? false,
-					transition?.delay ?? 0,
+					repeatCount ?? 0,
+					reverses ?? false,
+					delay ?? 0,
 				),
 			);
 	});
