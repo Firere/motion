@@ -1,4 +1,4 @@
-import { EasingFunction } from "./CustomTween/src";
+import type { Callback, EasingFunction } from "./CustomTween/src";
 import type { Easing } from "./easings";
 import { createMotionComponent, motion } from "./motion";
 import useSpritesheet from "./useSpritesheet";
@@ -24,6 +24,7 @@ export interface Transition {
 	reverses?: boolean;
 	repeatCount?: number;
 	delay?: number;
+	callback?: Callback;
 }
 
 export type Target<T extends Instance> = Partial<ExtractMembers<T, Tweenable>> & {

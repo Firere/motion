@@ -70,8 +70,11 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	targets.forEach((target) => {
 		const { transition } = target;
 		const properties = { ...target, transition: undefined };
-		const createNative = (tweenInfo: TweenInfo) =>
-			tweens.push(TweenService.Create(instance, tweenInfo, properties));
+		const createNative = (tweenInfo: TweenInfo) => {
+			const tween = TweenService.Create(instance, tweenInfo, properties);
+			tweens.push(tween);
+			if (transition?.callback) tween.Completed.Connect(transition.callback);
+		};
 		const createCustom = (easing: EasingFunction) =>
 			tweens.push(
 				new CustomTween(
@@ -82,6 +85,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 						repeatCount: transition?.repeatCount,
 						reverses: transition?.reverses,
 						delayTime: transition?.delay,
+						callback: transition?.callback,
 					},
 					properties,
 				),
