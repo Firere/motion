@@ -1,0 +1,8 @@
+{
+	"label": "Known Issues & Considerations",
+	"position": 3,
+	"link": {
+		"type": "generated-index",
+		"description": "Currently known issues or considerations that, if possible, should be patched in a future update."
+	}
+}

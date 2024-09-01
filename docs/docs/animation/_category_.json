@@ -1,0 +1,8 @@
+{
+	"label": "Animation",
+	"position": 2,
+	"link": {
+		"type": "generated-index",
+		"description": "The basic concepts involved with tweening using Motion."
+	}
+}
