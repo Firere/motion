@@ -1,6 +1,5 @@
 import type { Easing } from "./easings";
 import { createMotionComponent, motion } from "./motion";
-import useAnimation from "./useAnimation";
 import useSpritesheet from "./useSpritesheet";
 
 export type BezierArguments = [x1: number, y1: number, x2: number, y2: number];
@@ -52,5 +51,10 @@ export interface AnimationProps<T extends Instance> {
 	variants?: Variants<T>;
 }
 
+/**
+ * @deprecated renamed to `useTween`
+ */
+const useAnimation = useTween;
+
 export default motion;
-export { createMotionComponent, useAnimation, useSpritesheet };
+export { createMotionComponent, useAnimation, useSpritesheet, useTween };

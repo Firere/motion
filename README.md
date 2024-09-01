@@ -9,8 +9,8 @@ A port of `@rbxts/motion` to React.
 - [Variants](#variants)
 - [Sprite animations](#sprite-animations)
 - [Copy & paste example using `motion` object](#copy--paste-example-using-motion-object-works-with-hoarcekat)
-- [useAnimation](#useanimation)
-- [Copy & paste example using `useAnimation`](#copy--paste-example-using-useanimation-works-with-hoarcekat)
+- [useTween](#usetween)
+- [Copy & paste example using `useTween`](#copy--paste-example-using-useTween-works-with-hoarcekat)
 
 ## Introduction
 
@@ -407,13 +407,13 @@ export = (target: Instance) => {
 }
 ```
 
-## useAnimation
+## useTween
 
-That's not all Motion has to offer, though! If you'd like, you can use the `useAnimation` hook provided by motion. This allows you to animate any component in your codebase without having to use `motion` or the `animate` prop, as it returns a setter for the variant:
+That's not all Motion has to offer, though! If you'd like, you can use the `useTween` hook provided by motion. This allows you to animate any component in your codebase without having to use `motion` or the `animate` prop, as it returns a setter for the variant:
 
 ```tsx
 const ref = useRef<Frame>();
-const [variant, setVariant] = useAnimation(ref, {
+const [variant, setVariant] = useTween(ref, {
   initial: "default",
   transition: {
     duration: 3,
@@ -450,14 +450,14 @@ return (
 ```
 
 <<<<<<< Updated upstream
-Because `useAnimation` simply takes in a ref, you can animate any React component with Motion, even if the `motion` object doesn't have it! If you still want to use the same syntax as you would with the `motion` object but with a different element, Motion also exports `createMotionComponent`:
+Because `useTween` simply takes in a ref, you can animate any React component with Motion, even if the `motion` object doesn't have it! If you still want to use the same syntax as you would with the `motion` object but with a different element, Motion also exports `createMotionComponent`:
 
 ```tsx
 import { createMotionComponent } from "@rbxts/react-motion";
 
 const Part = createMotionComponent("Part");
 =======
-Because `useAnimation` simply takes in a ref, you can animate any React component with Motion, even if `Motion` doesn't have it! If you still want to use the same syntax as you would with `Motion` but with a different element, Motion also exports `createComponent`:
+Because `useTween` simply takes in a ref, you can animate any React component with Motion, even if `Motion` doesn't have it! If you still want to use the same syntax as you would with `Motion` but with a different element, Motion also exports `createComponent`:
 
 ```tsx
 const Part = motion.createComponent("Part");
@@ -465,12 +465,12 @@ const Part = motion.createComponent("Part");
 const part = <Part animate={} initial={} transition={} variants={} />
 ```
 
-## Copy & paste example using `useAnimation` (works with Hoarcekat)
+## Copy & paste example using `useTween` (works with Hoarcekat)
 
 ```tsx
 import React, { useRef } from "@rbxts/react";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
-import { useAnimation } from "@rbxts/react-motion";
+import { useTween } from "@rbxts/react-motion";
 
 const variants = {
   off: {
@@ -487,7 +487,7 @@ const variants = {
 
 function Button() {
   const button = useRef<TextButton>();
-  const [variant, setVariant] = useAnimation(button, {
+  const [variant, setVariant] = useTween(button, {
     variants,
     transition: {
       duration: 0.3
@@ -495,7 +495,7 @@ function Button() {
   });
 
   const uiCorner = useRef<UICorner>();
-  useAnimation(uiCorner, {
+  useTween(uiCorner, {
     animate: {
       CornerRadius: new UDim(0, variant === "on" ? 20 : 0),
     },

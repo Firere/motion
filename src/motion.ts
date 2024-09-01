@@ -1,6 +1,6 @@
 import React, { useEffect } from "@rbxts/react";
 import type { AnimationProps } from ".";
-import useAnimation from "./useAnimation";
+import useTween from "./useTween";
 import useSpritesheet, { SpritesheetArguments } from "./useSpritesheet";
 
 function excludeKeys<T extends object>(object: T, ...keys: string[]) {
@@ -22,7 +22,7 @@ export function createMotionComponent<
 	return React.forwardRef((props: React.InstanceProps<T> & AnimationProps<T>, forwardedRef?: React.Ref<T>) => {
 		const { initial, animate, transition, variants } = props;
 		const ref = (forwardedRef as React.RefObject<T>) ?? React.createRef<T>();
-		useAnimation(ref, { animate, initial, transition, variants });
+		useTween(ref, { animate, initial, transition, variants });
 
 		return React.createElement(elementType, {
 			...excludeKeys(props, "animate", "initial", "transition", "ref", "variants"),
