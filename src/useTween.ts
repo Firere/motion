@@ -52,11 +52,6 @@ function castToTargets<T extends Instance>(
 	return [addDefaultTransition(variants, targets, transition)];
 }
 
-function removeTransition<T extends Instance>(toCopy: Target<T>, applyOn: object) {
-	for (const [key, value] of pairs(toCopy as object))
-		if (key !== "transition") applyOn[key as never] = value as never;
-}
-
 // sure is great TweenInfo.new is one of the only
 // APIs that doesn't automatically cast enums
 const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
@@ -154,26 +149,28 @@ export default function <T extends Instance>(
 		const element = ref.current;
 		if (element === undefined) return;
 
+		const applyProperties = (properties: Target<T>) => {
+			for (const [key, value] of pairs(properties as object))
+				if (key !== "transition") element[key as never] = value as never;
+		};
+
 		initial ??= true;
 		if (typeIs(initial, "boolean")) {
 			if (initial) {
 				initialTweenDestructor = tween(element, targets);
 			} else {
-				targets.forEach((target) => removeTransition(target, element));
+				targets.forEach(applyProperties);
 			}
-			return;
-		}
-
-		removeTransition(
-			castToTargets(variants, initial, {})!.reduce(
-				(accumulator, target) => ({
-					...accumulator,
-					...target,
-				}),
-				{},
-			),
-			element,
-		);
+		} else
+			applyProperties(
+				castToTargets(variants, initial, {})!.reduce(
+					(accumulator, target) => ({
+						...accumulator,
+						...target,
+					}),
+					{},
+				),
+			);
 	}, []);
 
 	// animate
