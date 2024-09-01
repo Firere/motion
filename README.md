@@ -7,10 +7,9 @@ A port of `@rbxts/motion` to React.
 - [Transitions](#transitions)
 - [The `initial` prop](#the-initial-prop)
 - [Variants](#variants)
-- [Sprite animations](#sprite-animations)
 - [Copy & paste example using `motion` object](#copy--paste-example-using-motion-object-works-with-hoarcekat)
-- [useTween](#usetween)
-- [Copy & paste example using `useTween`](#copy--paste-example-using-useTween-works-with-hoarcekat)
+- [useAnimation](#useanimation)
+- [Copy & paste example using `useAnimation`](#copy--paste-example-using-useanimation-works-with-hoarcekat)
 
 ## Introduction
 
@@ -34,7 +33,7 @@ When the `animate` prop changes, Motion will automatically generate an animation
 
 ## Transitions
 
-A transition defines how values animate from one state to another. If you've ever used tweens in Roblox before, then it's very similar to using `TweenInfo`:
+A transition defines how values animate from one state to another. If you've ever used tweens in Roblox before, then it's the same as using `TweenInfo`:
 
 ```tsx
 const [size, setSize] = useState(UDim2.fromOffset(200, 50));
@@ -50,7 +49,8 @@ return (
     transition={{
       // each of these are also their respective defaults
       duration: 1,
-      ease: "linear",
+      easingStyle: Enum.EasingStyle.Linear,
+      easingDirection: "InOut", // strings can be casted to enums for convenience
       repeatCount: 0, // -1 for infinity
       reverse: false,
       delay: 0,
@@ -59,7 +59,7 @@ return (
 );
 ```
 
-Additionally, Motion allows you to pass cubic Bézier easing functions, [similarly to how you would in CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function#cubic-bezier-easing-function):
+Additionally, Motion allows you to use cubic Bézier easing functions, [similarly to how you would in CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/easing-function#cubic-bezier-easing-function):
 
 ```tsx
 const [size, setSize] = useState(UDim2.fromOffset(200, 50));
@@ -74,30 +74,16 @@ return (
     Text="Increase the size of this button!"
     transition={{
       duration: 1,
-      ease: [0.25, 0.1, 0.25, 1], // equivalent to `ease` in CSS
+      easingFunction: [0.25, 0.1, 0.25, 1], // equivalent to `ease` in CSS
     }}  
   />
 );
 ```
 
-You're also free to just write the easings built-in to the web...
+If you define `easingFunction`, then `easingDirection` and `easingStyle` will have no effect, and a Bézier tween will be used instead of a native Roblox tween.
 
-```
-transition={{
-  ease: "ease", // or "easeIn", "easeInOut" and "linear"
-}}
-```
-
-...or those found on [easings.net](https://easings.net/).
-
-```
-transition={{
-  ease: "easeOutQuint",
-}}
-```
-
->[!NOTE]
->Since all easings from easings.net (along with `linear`) are built into tweens on Roblox natively, Motion will automatically resort to using a native Roblox tween for performance and stability. You can still use custom Bézier tweens, of course, but keep in mind they may act unexpectedly or with suboptimal performance.
+>[!WARNING]
+>Bézier tweens are experimental and unlikely to behave exactly as regular tweens, though they aim to do so. Expect bugs and strange behaviour.
 
 ## The `initial` prop
 
@@ -178,7 +164,8 @@ const buttonVariants = {
     TextColor3: new Color3(0, 1, 0),
     transition={{ 
       duration: 20,
-      ease: "easeOutElastic", // overrides `easeInOutQuint`
+      easingStyle: "Elastic", // overrides Quint
+      easingDirection: "Out",
       reverses: true, // unique to the `hover` variant
     }}
   },
@@ -186,7 +173,8 @@ const buttonVariants = {
     TextColor3: new Color3(1, 1, 1),
     transition={{ 
       duration: 1, // overrides 20
-      ease: "easeInQuad", // overrides `easeInOutQuint`
+      easingStyle: "Quad", // overrides Quint
+      easingDirection: "In", // unique to the `default` variant
       repeatCount: 2, // unique to the `default` variant
     }}
   },
@@ -197,7 +185,7 @@ return (
     animate={state}
     transition={{
       duration: 20,
-      ease: "easeInOutQuint",
+      easingStyle: "Quint",
       delay: 0.5, // gets added to all variants
     }}
     Event={{
@@ -247,105 +235,6 @@ function SelectButton() {
 ```
 
 You could even go further and have components which accept passing down `animate` props and automatically merging them, like a `Button` which implemented the hovering animation and a `SelectButton` that implemented the `selected`-`unselected` variants and passed those down to `Button`.
-
-## Sprite animations
-
-Sprite animations are similar to (very short and small) videos in that they use rapidly changing frames to simulate a playing video, using a spritesheet. A spritesheet is an image which contains many sprites (which, in the case of sprite animation, act as our frames) in a regular sequence, for example this Mega Man spritesheet: ![A spritesheet containing 10 Mega Man sprites of him running.](assets/megaman-spritesheet.png)
-
-Motion provides you with a hook that can automatically play a sprite animation on an image:
-
-```tsx
-const { rectOffset, rectSize } = useSpritesheet({
-  fps: 23,
-  imageResolution: new Vector2(860, 270),
-  mode: "loop",
-  sprites: 10,
-  spritesPerLine: 5,
-});
-
-return (
-  <imagelabel
-    BackgroundTransparency={1}
-    Image="http://www.roblox.com/asset/?id=133583776880203"
-    ImageRectOffset={rectOffset}
-    ImageRectSize={rectSize}
-    Size={UDim2.fromOffset(50, 50)}
-  />
-);
-```
-
-The `mode` argument can be any of `loop`, `playOnce` and `static`:
-
-| Mode | Description |
-| --- | --- |
-| static | Remains on one frame and doesn't change unless frame is manually set using `setFrame`. |
-| playOnce | Plays the sprite animation, doesn't replay after the first iteration. |
-| loop | Plays the sprite animation, replays after each iteration. |
-
-Using this, you can also pause and play sprite animations:
-
-```tsx
-const [mode, setMode] = useState<"loop" | "playOnce" | "static">("static");
-const { rectOffset, rectSize } = useSpritesheet({
-  // `imageResolution`, `sprites` and `spritesPerAxis` defined somewhere already
-  mode,
-});
-
-return (
-  <frame>
-    <imagelabel
-      Image="ASSET_ID_HERE"
-      ImageRectOffset={rectOffset}
-      ImageRectSize={rectSize}
-      Size={UDim2.fromOffset(100, 100)}
-    />
-    <textbutton
-      Event={{
-        Activated: () => setMode(mode === "static" ? "loop" : "static")
-      }}
-      Size={UDim2.fromOffset(100, 100)}
-      Text={mode === "static" ? "Play" : "Pause"}
-    />
-    <uilistlayout />
-  </frame>
-);
-```
-
-See below for a full reference of arguments...
-
-| Argument | Type | Description |
-| --- | --- | --- |
-| active | `boolean`, optional, default: `true` | Whether the spritesheet is running. This differs from simply setting `mode` to `static` in that, when `active` is `false`, the hook will return to the default `rectOffset` and `rectSize` and will not manipulate the image in any way; you can think of this as a killswitch for the sprite animation. |
-| fps | `number`, optional, default: `15` | The speed at which your sprite animation is played. |
-| imageResolution | `Vector2`, required | The width and height of your decal. Images beyond 1024x1024 are downscaled; download your asset from the Roblox site to check for the true resolution. |
-| mode | `"static" \| "playOnce" \| "loop"`, optional, default: `"loop"` | The way in which Motion displays your sprite. |
-| range | `[number, number]`, optional | The range of sprites Motion will play through; 0-indexed and inclusive. |
-| sprites | `number`, required | The total number of sprites in your spritesheet. |
-| spritesPerLine | `number`, required | The number of sprites in one line. If `vertical` is `true`, then a line is a column in your spritesheet, otherwise it's a row. |
-| vertical | `boolean`, optional, default: `false` | Whether your sprites are laid out top-to-bottom. |
-
-...and below for a full reference of return values.
-
-| Return value | Type | Description |
-| --- | --- | --- |
-| frame | `number` | The current frame the sprite animation is on. This is just regular React state as returned from `useState`, so it can be passed as a dependency in `useEffect`, `useMemo` etc. |
-| rectOffset | `Vector2` | The current frame translated into an `ImageRectOffset`. You should pass this value as the `ImageRectOffset` prop in your `ImageButton` or your `ImageLabel`.
-| rectSize | `Vector2` | The calculated `ImageRectSize` based on `imageResolution`, `sprites`, `spritesPerLine` and `vertical`. You should pass this value as the `ImageRectSize` prop in your `ImageButton` or your `ImageLabel`. |
-| setFrame | `(frame: number) => void` | The setter for `frame`. This is also just the setter passed from `useState`, and you can use this function to manually set the current frame. |
-
-### Sprite animations using Motion components
-
-TODO
-
-### Limitations
-
-Motion's implementation of sprite animations does come with downsides, particularly against [SpriteClip](https://devforum.roblox.com/t/spriteclip-sprite-sheet-animation-module/294195?u=onerake), another module which implements sprite animations in Roblox.
-
-In particular, SpriteClip allows you to set offsets between sprites and the border of the image itself, while Motion currently requires there to be no padding or spacing between sprites or the edge of the spritesheet. Say this is your spritesheet: ![A spritesheet with a yellow border around the image and green margins between the sprites. There are 4 sprites: navy blue, white, red, and black.](assets/offset-spritesheet.png)
-
-Here, the yellow represents the border of the image, the green represents the offsets between each of the sprites, and the sprites themselves are blue, white, red and black.
-
-A spritesheet similar to this one would not be supported by Motion. If you have a spritesheet with spacing/padding between sprites and the spritesheet's border and you have no way of eliminating these, then consider using something like SpriteClip instead. You can find a roblox-ts compatible package [here](https://github.com/Firere/SpriteClip).
 
 ## Copy & paste example using `motion` object (works with Hoarcekat)
 
@@ -407,17 +296,17 @@ export = (target: Instance) => {
 }
 ```
 
-## useTween
+## useAnimation
 
-That's not all Motion has to offer, though! If you'd like, you can use the `useTween` hook provided by motion. This allows you to animate any component in your codebase without having to use `motion` or the `animate` prop, as it returns a setter for the variant:
+That's not all Motion has to offer, though! If you'd like, you can use the `useAnimation` hook provided by motion. This allows you to animate any component in your codebase without having to use `motion` or the `animate` prop, as it returns a setter for the variant:
 
 ```tsx
 const ref = useRef<Frame>();
-const [variant, setVariant] = useTween(ref, {
+const [variant, setVariant] = useAnimation(ref, {
   initial: "default",
   transition: {
     duration: 3,
-    ease: "easeInOutQuad",
+    easingStyle: "Quad",
   },
   variants: {
     hover: {
@@ -450,14 +339,14 @@ return (
 ```
 
 <<<<<<< Updated upstream
-Because `useTween` simply takes in a ref, you can animate any React component with Motion, even if the `motion` object doesn't have it! If you still want to use the same syntax as you would with the `motion` object but with a different element, Motion also exports `createMotionComponent`:
+Because `useAnimation` simply takes in a ref, you can animate any React component with Motion, even if the `motion` object doesn't have it! If you still want to use the same syntax as you would with the `motion` object but with a different element, Motion also exports `createMotionComponent`:
 
 ```tsx
 import { createMotionComponent } from "@rbxts/react-motion";
 
 const Part = createMotionComponent("Part");
 =======
-Because `useTween` simply takes in a ref, you can animate any React component with Motion, even if `Motion` doesn't have it! If you still want to use the same syntax as you would with `Motion` but with a different element, Motion also exports `createComponent`:
+Because `useAnimation` simply takes in a ref, you can animate any React component with Motion, even if `Motion` doesn't have it! If you still want to use the same syntax as you would with `Motion` but with a different element, Motion also exports `createComponent`:
 
 ```tsx
 const Part = motion.createComponent("Part");
@@ -465,12 +354,12 @@ const Part = motion.createComponent("Part");
 const part = <Part animate={} initial={} transition={} variants={} />
 ```
 
-## Copy & paste example using `useTween` (works with Hoarcekat)
+## Copy & paste example using `useAnimation` (works with Hoarcekat)
 
 ```tsx
 import React, { useRef } from "@rbxts/react";
 import { createPortal, createRoot } from "@rbxts/react-roblox";
-import { useTween } from "@rbxts/react-motion";
+import { useAnimation } from "@rbxts/react-motion";
 
 const variants = {
   off: {
@@ -487,7 +376,7 @@ const variants = {
 
 function Button() {
   const button = useRef<TextButton>();
-  const [variant, setVariant] = useTween(button, {
+  const [variant, setVariant] = useAnimation(button, {
     variants,
     transition: {
       duration: 0.3
@@ -495,7 +384,7 @@ function Button() {
   });
 
   const uiCorner = useRef<UICorner>();
-  useTween(uiCorner, {
+  useAnimation(uiCorner, {
     animate: {
       CornerRadius: new UDim(0, variant === "on" ? 20 : 0),
     },

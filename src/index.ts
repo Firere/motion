@@ -1,50 +1,30 @@
-import { EasingFunction } from "./CustomTween/src";
-import type { Easing } from "./easings";
 import { createMotionComponent, motion } from "./motion";
-import useSpritesheet from "./useSpritesheet";
-import useTween from "./useTween";
-
-export type BezierDefinition = [x1: number, y1: number, x2: number, y2: number];
+import useAnimation from "./useAnimation";
 
 export interface Transition {
 	duration?: number;
-	ease?: BezierDefinition | Easing | EasingFunction;
-	/**
-	 * @deprecated `easingStyle` has been deprecated in favour of `ease`.
-	 */
 	easingStyle?: Enum.EasingStyle | (CastsToEnum<Enum.EasingStyle> & string);
-	/**
-	 * @deprecated `easingDirection` has been deprecated in favour of `ease`.
-	 */
 	easingDirection?: Enum.EasingDirection | (CastsToEnum<Enum.EasingDirection> & string);
-	/**
-	 * @deprecated `easingFunction` has been deprecated in favour of `ease`.
-	 */
-	easingFunction?: BezierDefinition;
+	easingFunction?: [x1: number, y1: number, x2: number, y2: number];
 	reverses?: boolean;
 	repeatCount?: number;
 	delay?: number;
 }
 
-export type Target<T extends Instance> = Partial<ExtractMembers<T, Tweenable>> & {
+export type Target<T extends Instance> = Partial<ExtractMembers<T, Tweenable>>;
+
+export type TargetAndTransition<T extends Instance> = Target<T> & {
 	transition?: Transition;
 };
 
-/**
- * @deprecated `TargetAndTransition` has been renamed to `Target` to refine Motion's concepts. If you need the type that was previously `Target`, it is simply `Partial<ExtractMembers<T, Tweenable>>`.
- */
-export type TargetAndTransition<T extends Instance> = Target<T>;
+export type Variants<T extends Instance> = Record<string, TargetAndTransition<T>>;
 
-export type Variant = string;
-
-/**
- * @deprecated in favour of `Variant`
- */
 export type VariantLabel = string;
 
-export type Variants<T extends Instance> = Record<Variant, Target<T>>;
-
-export type CastsToTarget<T extends Instance> = Target<T> | Variant | (Target<T> | Variant)[];
+export type CastsToTarget<T extends Instance> =
+	| TargetAndTransition<T>
+	| VariantLabel
+	| (TargetAndTransition<T> | VariantLabel)[];
 
 export interface AnimationProps<T extends Instance> {
 	animate?: CastsToTarget<T>;
@@ -53,10 +33,5 @@ export interface AnimationProps<T extends Instance> {
 	variants?: Variants<T>;
 }
 
-/**
- * @deprecated renamed to `useTween`
- */
-const useAnimation = useTween;
-
 export default motion;
-export { createMotionComponent, useAnimation, useSpritesheet, useTween };
+export { createMotionComponent, useAnimation };
