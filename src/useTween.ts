@@ -92,7 +92,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 					properties,
 				),
 			});
-		const createBezier = (bezierArguments: BezierDefinition) => createCustom(new Bezier(...bezierArguments));
+		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));
 
 		let ease = transition.ease ?? easingFunction;
 		if (easingStyle === undefined && easingDirection === undefined) ease ??= "linear";
