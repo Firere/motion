@@ -4,7 +4,7 @@ import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import type { AnimationProps, BezierDefinition, CastsToTarget, Target, Transition, Variant } from ".";
 import Bezier from "./cubic-bezier";
-import CustomTween, { EasingFunction } from "./CustomTween/src";
+import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
 
 function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: Variant) {
@@ -65,19 +65,19 @@ const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
 ) => (typeIs(enumItem, "string") ? enumObject[enumItem] : enumItem);
 
 function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
-	const tweens: (Tween | CustomTween<T>)[] = [];
+	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = [];
 
 	targets.forEach((target) => {
 		const { transition } = target;
 		const properties = { ...target, transition: undefined };
 		const createNative = (tweenInfo: TweenInfo) => {
 			const tween = TweenService.Create(instance, tweenInfo, properties);
-			tweens.push(tween);
+			tweens.push({ tween, callback: transition?.callback });
 			if (transition?.callback) tween.Completed.Connect(transition.callback);
 		};
 		const createCustom = (easing: EasingFunction) =>
-			tweens.push(
-				new CustomTween(
+			tweens.push({
+				tween: new CustomTween(
 					instance,
 					{
 						time: transition?.duration,
@@ -89,7 +89,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 					},
 					properties,
 				),
-			);
+			});
 		const createBezier = (bezierArguments: BezierDefinition) => createCustom(new Bezier(...bezierArguments));
 
 		const ease = transition?.ease ?? transition?.easingFunction;
@@ -146,8 +146,12 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			);
 	});
 
-	tweens.forEach((tween) => (tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
-	return () => tweens.forEach((tween) => (tween as Tween).Destroy());
+	tweens.forEach((tween) => (tween.tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
+	return () =>
+		tweens.forEach((tween) => {
+			if (typeIs(tween.tween, "Instance")) tween.callback?.(tween.tween.PlaybackState);
+			(tween.tween as Tween).Destroy();
+		});
 }
 
 export default function <T extends Instance>(
