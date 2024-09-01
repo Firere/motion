@@ -50,7 +50,7 @@ return (
     transition={{
       // each of these are also their respective defaults
       duration: 1,
-      easingFunction: "linear",
+      ease: "linear",
       repeatCount: 0, // -1 for infinity
       reverse: false,
       delay: 0,
@@ -74,7 +74,7 @@ return (
     Text="Increase the size of this button!"
     transition={{
       duration: 1,
-      easingFunction: [0.25, 0.1, 0.25, 1], // equivalent to `ease` in CSS
+      ease: [0.25, 0.1, 0.25, 1], // equivalent to `ease` in CSS
     }}  
   />
 );
@@ -84,7 +84,7 @@ You're also free to just write the easings built-in to the web...
 
 ```
 transition={{
-  easingFunction: "ease", // or "easeIn", "easeInOut" and "linear"
+  ease: "ease", // or "easeIn", "easeInOut" and "linear"
 }}
 ```
 
@@ -92,7 +92,7 @@ transition={{
 
 ```
 transition={{
-  easingFunction: "easeOutQuint",
+  ease: "easeOutQuint",
 }}
 ```
 
@@ -178,7 +178,7 @@ const buttonVariants = {
     TextColor3: new Color3(0, 1, 0),
     transition={{ 
       duration: 20,
-      easingFunction: "easeOutElastic", // overrides `easeInOutQuint`
+      ease: "easeOutElastic", // overrides `easeInOutQuint`
       reverses: true, // unique to the `hover` variant
     }}
   },
@@ -186,7 +186,7 @@ const buttonVariants = {
     TextColor3: new Color3(1, 1, 1),
     transition={{ 
       duration: 1, // overrides 20
-      easingFunction: "easeInQuad", // overrides `easeInOutQuint`
+      ease: "easeInQuad", // overrides `easeInOutQuint`
       repeatCount: 2, // unique to the `default` variant
     }}
   },
@@ -197,7 +197,7 @@ return (
     animate={state}
     transition={{
       duration: 20,
-      easingFunction: "easeInOutQuint",
+      ease: "easeInOutQuint",
       delay: 0.5, // gets added to all variants
     }}
     Event={{
@@ -417,7 +417,7 @@ const [variant, setVariant] = useTween(ref, {
   initial: "default",
   transition: {
     duration: 3,
-    easingFunction: "easeInOutQuad",
+    ease: "easeInOutQuad",
   },
   variants: {
     hover: {

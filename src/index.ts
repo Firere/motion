@@ -1,24 +1,26 @@
+import { EasingFunction } from "./CustomTween/src";
 import type { Easing } from "./easings";
 import { createMotionComponent, motion } from "./motion";
 import useSpritesheet from "./useSpritesheet";
+import useTween from "./useTween";
 
-export type BezierArguments = [x1: number, y1: number, x2: number, y2: number];
+export type BezierDefinition = [x1: number, y1: number, x2: number, y2: number];
 
 export interface Transition {
 	duration?: number;
-	easing?: BezierArguments | Easing | ((delta: number) => number);
+	ease?: BezierDefinition | Easing | EasingFunction;
 	/**
-	 * @deprecated `easingStyle` has been deprecated in favour of `easing`.
+	 * @deprecated `easingStyle` has been deprecated in favour of `ease`.
 	 */
 	easingStyle?: Enum.EasingStyle | (CastsToEnum<Enum.EasingStyle> & string);
 	/**
-	 * @deprecated `easingDirection` has been deprecated in favour of `easing`.
+	 * @deprecated `easingDirection` has been deprecated in favour of `ease`.
 	 */
 	easingDirection?: Enum.EasingDirection | (CastsToEnum<Enum.EasingDirection> & string);
 	/**
-	 * @deprecated `easingFunction` has been deprecated in favour of `easing`.
+	 * @deprecated `easingFunction` has been deprecated in favour of `ease`.
 	 */
-	easingFunction?: BezierArguments;
+	easingFunction?: BezierDefinition;
 	reverses?: boolean;
 	repeatCount?: number;
 	delay?: number;

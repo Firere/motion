@@ -2,7 +2,7 @@ import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import type { AnimationProps, BezierArguments, CastsToTarget, Target, Transition, Variant } from ".";
+import type { AnimationProps, BezierDefinition, CastsToTarget, Target, Transition, Variant } from ".";
 import Bezier from "./cubic-bezier";
 import CustomTween, { EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
@@ -86,16 +86,16 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 					properties,
 				),
 			);
-		const createBezier = (bezierArguments: BezierArguments) => createCustom(new Bezier(...bezierArguments));
+		const createBezier = (bezierArguments: BezierDefinition) => createCustom(new Bezier(...bezierArguments));
 
-		const easing = transition?.easing ?? transition?.easingFunction;
+		const ease = transition?.ease ?? transition?.easingFunction;
 
 		// ! the README lies: `easing` is `undefined` by default, not `linear`
 		// this is done to avoid exposing new users to the deprecated `easingStyle`,
 		// `easingDirection` and `easingFunction`, but also to keep legacy code working
-		if (easing !== undefined) {
-			if (typeIs(easing, "string")) {
-				const preset = easings[easing];
+		if (ease !== undefined) {
+			if (typeIs(ease, "string")) {
+				const preset = easings[ease];
 				if (preset[1]) {
 					createNative(
 						preset[1](
@@ -106,13 +106,13 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 						),
 					);
 				} else createBezier(preset[0]);
-			} else if (t.array(t.number)(easing)) {
+			} else if (t.array(t.number)(ease)) {
 				// it's preferable to use a native tween, so we search through easings to see
 				// if the provided easing function has a native equivalent and use that instead
 				let foundNativeEquivalent = false;
 				// eslint-disable-next-line
 				for (const [_, [easingFunction, native]] of ipairs(Object.values(easings))) {
-					if (easingFunction && native && Object.deepEquals(easing, easingFunction)) {
+					if (easingFunction && native && Object.deepEquals(ease, easingFunction)) {
 						createNative(
 							native(
 								transition?.duration,
@@ -126,8 +126,8 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 					}
 				}
 
-				if (!foundNativeEquivalent) createBezier(easing);
-			} else createCustom(easing);
+				if (!foundNativeEquivalent) createBezier(ease);
+			} else createCustom(ease);
 		}
 		// ! legacy
 		else

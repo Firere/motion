@@ -1,4 +1,4 @@
-import type { BezierArguments } from ".";
+import type { BezierDefinition } from ".";
 
 export type Easing =
 	| "linear"
@@ -54,8 +54,8 @@ const createCaster =
 
 const easings: Record<
 	Easing,
-	| [BezierArguments, ReturnType<typeof createCaster>]
-	| [BezierArguments, undefined]
+	| [BezierDefinition, ReturnType<typeof createCaster>]
+	| [BezierDefinition, undefined]
 	| [undefined, ReturnType<typeof createCaster>]
 > = {
 	linear: [[0, 0, 1, 1], createCaster("InOut", "Linear")],
