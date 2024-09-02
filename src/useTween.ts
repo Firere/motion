@@ -19,9 +19,14 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = [];
 
 	targets.forEach((target) => {
-		let transition = target.transition;
-		// explicitly defines defaults in case either `Tween` or `CustomTween` change their own defaults
-		transition ??= { duration: 1, ease: "linear", repeatCount: 0, reverses: false, delay: 0 };
+		const transition = target.transition ?? {
+			// explicitly defines defaults in case either `TweenInfo` or `CustomTween` change their own defaults
+			duration: 1,
+			ease: "linear",
+			repeatCount: 0,
+			reverses: false,
+			delay: 0,
+		};
 		const { duration, easingStyle, easingDirection, easingFunction, repeatCount, reverses, delay, callback } =
 			transition;
 
