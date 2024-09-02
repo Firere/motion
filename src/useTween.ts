@@ -18,7 +18,7 @@ function castToTargets<T extends Instance>(
 	const utility = new TargetUtil(transition, variants);
 
 	if (t.array(t.union(t.string, t.table))(targets)) {
-		const casted = targets.map(utility.addDefaultTransition);
+		const casted = targets.map((target) => utility.addDefaultTransition(utility.castToTarget(target)));
 
 		// some targets may contain the same property, resulting in multiple
 		// Tweens potentially messing with it, so all conflicts are handled here
@@ -33,7 +33,7 @@ function castToTargets<T extends Instance>(
 
 		return casted;
 	}
-	return [utility.addDefaultTransition(targets)];
+	return [utility.addDefaultTransition(utility.castToTarget(targets))];
 }
 
 // sure is great TweenInfo.new is one of the only

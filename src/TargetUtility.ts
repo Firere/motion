@@ -1,5 +1,5 @@
 import Object from "@rbxts/object-utils";
-import { AnimationProps, CastsToTarget, Transition } from ".";
+import type { AnimationProps, CastsToTarget, Target, Transition } from ".";
 import { Callback } from "./CustomTween/src";
 
 export default class TargetUtil<T extends Instance> {
@@ -11,9 +11,7 @@ export default class TargetUtil<T extends Instance> {
 		this.variants = variants;
 	}
 
-	public addDefaultTransition(targetOrVariant: CastsToTarget<T>) {
-		const target = this.castToTarget(targetOrVariant);
-
+	public addDefaultTransition(target: Target<T>) {
 		if (this.defaultTransition === undefined) return target;
 		if (target.transition === undefined) return { ...target, transition: this.defaultTransition };
 
