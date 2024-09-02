@@ -13,9 +13,10 @@ function castToTargets<T extends Instance>(
 	targets: CastsToTargets<T> | undefined,
 	transition?: Transition,
 ) {
+	if (targets === undefined) return undefined;
+
 	const utility = new TargetUtil(transition, variants);
 
-	if (targets === undefined) return undefined;
 	if (t.array(t.union(t.string, t.table))(targets)) {
 		const casted = targets.map(utility.addDefaultTransition);
 
