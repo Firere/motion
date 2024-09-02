@@ -9,12 +9,7 @@ import easings from "./easings";
 
 function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: Variant) {
 	assert(variants, `Variant "${variant}" cannot be set because no variants have been set`);
-	assert(
-		variant in variants,
-		`Variant "${tostring(variant)}" is invalid: ${Object.keys(variants)
-			.filter((v) => typeIs(v, "string"))
-			.join(", ")}`,
-	);
+	assert(variant in variants, `Variant "${tostring(variant)}" is invalid: ${Object.keys(variants).join(", ")}`);
 	return variants[variant];
 }
 
