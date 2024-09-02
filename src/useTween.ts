@@ -24,7 +24,7 @@ function castToTargets<T extends Instance>(
 		// Tweens potentially messing with it, so all conflicts are handled here
 		const alreadyModified = new Set<keyof Partial<Extract<T, Tweenable>>>();
 		for (let i = casted.size() - 1; i >= 0; i--)
-			for (const [key, _] of pairs(casted[i] as object)) {
+			for (const [key] of pairs(casted[i] as object)) {
 				if (key === "transition") continue;
 				if (alreadyModified.has(key as never)) {
 					delete casted[i][key as never];
@@ -85,7 +85,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				// if the provided easing function has a native equivalent and use that instead
 				let foundNativeEquivalent = false;
 				// eslint-disable-next-line
-				for (const [_, [easingFunction, native]] of ipairs(Object.values(easings))) {
+				for (const [, [easingFunction, native]] of ipairs(Object.values(easings))) {
 					if (easingFunction && native && Object.deepEquals(ease, easingFunction)) {
 						createNative(...native);
 						foundNativeEquivalent = true;
