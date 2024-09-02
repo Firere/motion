@@ -21,8 +21,8 @@ export default class TargetUtil<T extends Instance> {
 		let callback!: Callback;
 		if (this.defaultTransition.callback !== undefined && target.transition.callback !== undefined) {
 			callback = (playbackState) => {
-				// non-null assertions are bad, however I've literally just checked both
-				// of these, and I don't use optional chaining so as to prevent another check
+				// non-null assertions are bad but I've literally just checked both of these,
+				// and I don't want to use optional chaining so as to prevent another check
 				this.defaultTransition!.callback!(playbackState);
 				target.transition!.callback!(playbackState);
 			};
