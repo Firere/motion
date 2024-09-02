@@ -1,40 +1,12 @@
 import Object from "@rbxts/object-utils";
-import React, { useEffect, useState } from "@rbxts/react";
+import React, { useEffect, useMemo, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import type { AnimationProps, BezierDefinition, CastsToTargets, Target, Transition } from ".";
+import type { AnimationProps, BezierDefinition, CastsToTargets, Target } from ".";
 import Bezier from "./cubic-bezier";
 import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
 import TargetUtility from "./TargetUtility";
-
-function castToTargets<T extends Instance>(
-	variants: AnimationProps<T>["variants"],
-	targets: CastsToTargets<T> | undefined,
-	transition?: Transition,
-) {
-	if (targets === undefined) return undefined;
-
-	const utility = new TargetUtility(transition, variants);
-
-	if (t.array(t.union(t.string, t.table))(targets)) {
-		const casted = targets.map((target) => utility.addDefaultTransition(utility.castToTarget(target)));
-
-		// some targets may contain the same property, resulting in multiple
-		// Tweens potentially messing with it, so all conflicts are handled here
-		const alreadyModified = new Set<keyof Partial<Extract<T, Tweenable>>>();
-		for (let i = casted.size() - 1; i >= 0; i--)
-			for (const [key] of pairs(casted[i] as object)) {
-				if (key === "transition") continue;
-				if (alreadyModified.has(key as never)) {
-					delete casted[i][key as never];
-				} else alreadyModified.add(key as never);
-			}
-
-		return casted;
-	}
-	return [utility.addDefaultTransition(utility.castToTarget(targets))];
-}
 
 // sure is great TweenInfo.new is one of the only
 // APIs that doesn't automatically cast enums
@@ -118,14 +90,17 @@ export default function <T extends Instance>(
 	{ animate, initial, transition, variants }: AnimationProps<T>,
 ): [string, (variant: string) => void] {
 	const [variantState, setVariantState] = useState<CastsToTargets<T>>();
-	const currentTargets: Target<T>[] = castToTargets(variants, variantState, transition) ?? [];
+
+	const utility = useMemo(() => new TargetUtility(transition, variants), [transition, variants]);
+
+	const currentTargets: Target<T>[] = utility.castToTargets(variantState) ?? [];
 	/**
 	 * ? variantState is overridden by the `animate` prop,
 	 * which in effect makes `setVariant` in a normal use of
 	 * useAnimation useless if `animate` is defined. rethink
 	 * how this is implemented, maybe?
 	 */
-	const targets = castToTargets(variants, animate, transition) ?? currentTargets;
+	const targets = utility.castToTargets(animate) ?? currentTargets;
 
 	// initial
 	let initialTweenDestructor: (() => void) | undefined;
@@ -141,7 +116,7 @@ export default function <T extends Instance>(
 		initial ??= true;
 		if (!typeIs(initial, "boolean")) {
 			applyProperties(
-				castToTargets(variants, initial, {})!.reduce(
+				utility.castToTargets(initial, true)!.reduce(
 					(accumulator, target) => ({
 						...accumulator,
 						...target,
