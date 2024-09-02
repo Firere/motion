@@ -6,7 +6,7 @@ import type { AnimationProps, BezierDefinition, CastsToTargets, Target, Transiti
 import Bezier from "./cubic-bezier";
 import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
-import TargetUtil from "./TargetUtility";
+import TargetUtility from "./TargetUtility";
 
 function castToTargets<T extends Instance>(
 	variants: AnimationProps<T>["variants"],
@@ -15,7 +15,7 @@ function castToTargets<T extends Instance>(
 ) {
 	if (targets === undefined) return undefined;
 
-	const utility = new TargetUtil(transition, variants);
+	const utility = new TargetUtility(transition, variants);
 
 	if (t.array(t.union(t.string, t.table))(targets)) {
 		const casted = targets.map((target) => utility.addDefaultTransition(utility.castToTarget(target)));
