@@ -1,6 +1,7 @@
 import type { Callback, EasingFunction } from "./CustomTween/src";
 import type { Easing } from "./easings";
 import { createMotionComponent, motion } from "./motion";
+import Presence from "./Presence";
 import useSpritesheet from "./useSpritesheet";
 import useTween from "./useTween";
 
@@ -45,11 +46,14 @@ export type VariantLabel = string;
 
 export type Variants<T extends Instance> = Record<Variant, Target<T>>;
 
-export type CastsToTarget<T extends Instance> = Target<T> | Variant | (Target<T> | Variant)[];
+export type CastsToTarget<T extends Instance> = Target<T> | Variant;
+
+export type CastsToTargets<T extends Instance> = CastsToTarget<T> | CastsToTarget<T>[];
 
 export interface AnimationProps<T extends Instance> {
-	animate?: CastsToTarget<T>;
-	initial?: CastsToTarget<T> | boolean;
+	animate?: CastsToTargets<T>;
+	exit?: CastsToTargets<T>;
+	initial?: CastsToTargets<T> | boolean;
 	transition?: Transition;
 	variants?: Variants<T>;
 }
@@ -60,4 +64,4 @@ export interface AnimationProps<T extends Instance> {
 const useAnimation = useTween;
 
 export default motion;
-export { createMotionComponent, useAnimation, useSpritesheet, useTween };
+export { createMotionComponent, Presence, useAnimation, useSpritesheet, useTween };

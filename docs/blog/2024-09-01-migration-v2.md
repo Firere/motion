@@ -63,13 +63,19 @@ In v2, Motion treats these slightly differently, in that if it can find an equiv
 
 The `useAnimation` hook has been renamed to `useTween` in the effort of more clearly defining Motion's concepts, both in the docs and in the code. `useAnimation` is still exported, but marked as deprecated and as such will be ~~struck-through~~. All you need to do to migrate this is to switch out `useAnimation` with `useTween`.
 
+## `CastsToTarget` and `CastsToTargets` Types
+
+`CastsToTarget` has been renamed to `CastsToTargets` to reflect that it can be an array of targets. Code previously using `CastsToTarget` will not work.
+
+`CastsToTarget` has been redefined to be either a `Target` or a `Variant`, but not an array of either.
+
 ## `Target` and `TargetAndTransition` Types
 
 `TargetAndTransition` has been renamed to `Target`, and has no additional changes. Any code currently importing and using `TargetAndTransition` still works, though it's marked as deprecated.
 
 The type which was previously named and exported as `Target` has been removed, making this a slightly breaking change. The conversion here is really simple: `Target<T>` becomes `Partial<ExtractMembers<T, Tweenable>>`.
 
-This change has likewise been done to refine and make clearer the concepts underneath Motion for these new docs.
+This change has likewise been done to refine and make clearer the concepts underneath Motion for these new docs, even if it deviates from Framer Motion.
 
 ## `VariantLabel` -> `Variant`
 

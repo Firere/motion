@@ -2,34 +2,22 @@ import Object from "@rbxts/object-utils";
 import React, { useEffect, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import type { AnimationProps, BezierDefinition, CastsToTarget, Target, Transition, Variant } from ".";
+import type { AnimationProps, BezierDefinition, CastsToTargets, Target, Transition } from ".";
 import Bezier from "./cubic-bezier";
 import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
-
-function getVariant<T extends Instance>(variants: AnimationProps<T>["variants"], variant: Variant) {
-	assert(variants, `Variant "${variant}" cannot be set because no variants have been set`);
-	assert(variant in variants, `Variant "${tostring(variant)}" is invalid: ${Object.keys(variants).join(", ")}`);
-	return variants[variant];
-}
-
-function addDefaultTransition<T extends Instance>(
-	variants: AnimationProps<T>["variants"],
-	target: Variant | Target<T>,
-	transition?: Transition,
-) {
-	const casted = typeIs(target, "string") ? getVariant(variants, target) : target;
-	return { ...casted, transition: { ...transition, ...casted.transition } };
-}
+import TargetUtil from "./TargetUtility";
 
 function castToTargets<T extends Instance>(
 	variants: AnimationProps<T>["variants"],
-	targets: CastsToTarget<T> | undefined,
+	targets: CastsToTargets<T> | undefined,
 	transition?: Transition,
 ) {
+	const utility = new TargetUtil(transition, variants);
+
 	if (targets === undefined) return undefined;
 	if (t.array(t.union(t.string, t.table))(targets)) {
-		const casted = targets.map((target) => addDefaultTransition(variants, target, transition));
+		const casted = targets.map(utility.addDefaultTransition);
 
 		// some targets may contain the same property, resulting in multiple
 		// Tweens potentially messing with it, so all conflicts are handled here
@@ -44,7 +32,7 @@ function castToTargets<T extends Instance>(
 
 		return casted;
 	}
-	return [addDefaultTransition(variants, targets, transition)];
+	return [utility.addDefaultTransition(targets)];
 }
 
 // sure is great TweenInfo.new is one of the only
@@ -128,7 +116,7 @@ export default function <T extends Instance>(
 	ref: React.RefObject<T>,
 	{ animate, initial, transition, variants }: AnimationProps<T>,
 ): [string, (variant: string) => void] {
-	const [variantState, setVariantState] = useState<CastsToTarget<T>>();
+	const [variantState, setVariantState] = useState<CastsToTargets<T>>();
 	const currentTargets: Target<T>[] = castToTargets(variants, variantState, transition) ?? [];
 	/**
 	 * ? variantState is overridden by the `animate` prop,
