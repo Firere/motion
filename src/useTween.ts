@@ -112,6 +112,7 @@ export default function <T extends Instance>(
 		const element = ref.current;
 		if (element === undefined) return;
 
+		// ? this means callbacks don't get run because `tween` is never run, which might be unexpected
 		const applyProperties = (properties: Target<T>) => {
 			for (const [key, value] of pairs(properties as object))
 				if (key !== "transition") element[key as never] = value as never;
