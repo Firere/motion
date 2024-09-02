@@ -98,14 +98,13 @@ export default function <T extends Instance>(
 
 	const utility = useMemo(() => new TargetUtility(transition, variants), [transition, variants]);
 
-	const currentTargets: Target<T>[] = utility.castToTargets(variantState) ?? [];
 	/**
 	 * ? variantState is overridden by the `animate` prop,
 	 * which in effect makes `setVariant` in a normal use of
 	 * useAnimation useless if `animate` is defined. rethink
 	 * how this is implemented, maybe?
 	 */
-	const targets = utility.castToTargets(animate) ?? currentTargets;
+	const targets = utility.castToTargets(animate) ?? utility.castToTargets(variantState) ?? [];
 
 	// initial
 	let initialTweenDestructor: (() => void) | undefined;
