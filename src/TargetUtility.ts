@@ -1,5 +1,5 @@
 import Object from "@rbxts/object-utils";
-import { AnimationProps, CastsToTarget, Transition, Variant } from ".";
+import { AnimationProps, CastsToTarget, Transition } from ".";
 import { Callback } from "./CustomTween/src";
 
 export default class TargetUtil<T extends Instance> {
