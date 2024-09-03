@@ -18,8 +18,8 @@
 	"types": "out/index.d.ts",
 	"files": [
 		"out",
-		"!out/bezier-tween/*",
-		"out/bezier-tween/src/*",
+		"!out/CustomTween/*",
+		"out/CustomTween/src/*",
 		"!**/*.tsbuildinfo"
 	],
 	"publishConfig": {
