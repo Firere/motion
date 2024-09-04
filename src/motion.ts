@@ -1,7 +1,7 @@
 import React, { useEffect } from "@rbxts/react";
 import type { AnimationProps } from ".";
-import useTween from "./useTween";
 import useSpritesheet, { SpritesheetArguments } from "./useSpritesheet";
+import useTween from "./useTween";
 
 function excludeKeys<T extends object>(object: T, ...keys: string[]) {
 	const filtered: Partial<T> = {};
@@ -15,10 +15,8 @@ function excludeKeys<T extends object>(object: T, ...keys: string[]) {
  * @param elementType  Instance class to convert to a motion component. Must be creatable.
  * @returns Motion component of whatever `Instance` was passed in. You can use this just like you'd use any of the `motion.[element]` components.
  */
-export function createMotionComponent<
-	K extends keyof CreatableInstances,
-	T extends CreatableInstances[K] = CreatableInstances[K],
->(elementType: K) {
+export function createMotionComponent<K extends keyof CreatableInstances>(elementType: K) {
+	type T = CreatableInstances[K];
 	return React.forwardRef((props: React.InstanceProps<T> & AnimationProps<T>, forwardedRef?: React.Ref<T>) => {
 		const { initial, animate, transition, variants } = props;
 		const ref = (forwardedRef as React.RefObject<T>) ?? React.createRef<T>();
@@ -31,10 +29,8 @@ export function createMotionComponent<
 	});
 }
 
-function createSpritesheetComponent<
-	K extends "ImageButton" | "ImageLabel",
-	T extends CreatableInstances[K] = CreatableInstances[K],
->(elementType: K) {
+function createSpritesheetComponent<K extends "ImageButton" | "ImageLabel">(elementType: K) {
+	type T = CreatableInstances[K];
 	return React.forwardRef(
 		(
 			// 3 intersections - very ugly!
