@@ -1,7 +1,7 @@
 import Object from "@rbxts/object-utils";
 import { t } from "@rbxts/t";
 import type { AnimationProps, CastsToTarget, CastsToTargets, Target, Transition } from ".";
-import { Callback } from "./CustomTween/src";
+import type { Callback } from "./CustomTween/src";
 
 // I wanted to decompose a bit of `useTween` and ended up mixing functional and OOP. extremely cursed! but it works better imo
 
