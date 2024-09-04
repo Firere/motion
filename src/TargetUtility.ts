@@ -6,6 +6,7 @@ import type { Callback } from "./CustomTween/src";
 // I wanted to decompose a bit of `useTween` and ended up mixing functional and OOP. extremely cursed! but it works better imo
 
 export default class TargetUtility<T extends Instance> {
+	// `TargetUtility` only takes the default transition and variants because `animate` and `initial` may vary and so they would need their own utility to work
 	private defaultTransition?: Transition;
 	private variants: AnimationProps<T>["variants"];
 
