@@ -120,15 +120,7 @@ export default function <T extends Instance>(
 
 		const nonNil = initial ?? true;
 		if (!typeIs(nonNil, "boolean")) {
-			applyProperties(
-				utility.castToTargets(nonNil, true)!.reduce(
-					(accumulator, target) => ({
-						...accumulator,
-						...target,
-					}),
-					{},
-				),
-			);
+			applyProperties(utility.castToTargets(nonNil, true)!.reduce(Object.assign, {}));
 		} else if (nonNil) {
 			initialTweenDestructor = tween(element, targets);
 		} else {
