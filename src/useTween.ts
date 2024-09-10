@@ -118,10 +118,10 @@ export default function <T extends Instance>(
 				if (key !== "transition") element[key as never] = value as never;
 		};
 
-		initial ??= true;
-		if (!typeIs(initial, "boolean")) {
+		const nonNil = initial ?? true;
+		if (!typeIs(nonNil, "boolean")) {
 			applyProperties(
-				utility.castToTargets(initial, true)!.reduce(
+				utility.castToTargets(nonNil, true)!.reduce(
 					(accumulator, target) => ({
 						...accumulator,
 						...target,
@@ -129,7 +129,7 @@ export default function <T extends Instance>(
 					{},
 				),
 			);
-		} else if (initial) {
+		} else if (nonNil) {
 			initialTweenDestructor = tween(element, targets);
 		} else {
 			targets.forEach(applyProperties);
