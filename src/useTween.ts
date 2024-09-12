@@ -101,7 +101,7 @@ export default function <T extends Instance>(
 	 * useAnimation useless if `animate` is defined. rethink
 	 * how this is implemented, maybe?
 	 */
-	const targets = utility.castToTargets(animate) ?? utility.castToTargets(variantState) ?? [];
+	const targets = utility.castToTargets(animate ?? variantState) ?? [];
 
 	// initial
 	let initialTweenDestructor: (() => void) | undefined;
