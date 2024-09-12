@@ -5,15 +5,11 @@ import { t } from "@rbxts/t";
 import type { AnimationProps, BezierDefinition, CastsToTargets, Target, Transition } from ".";
 import Bezier from "./cubic-bezier";
 import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
-import easings from "./easings";
+import easings, { Easing } from "./easings";
 import TargetUtility from "./TargetUtility";
 
-// sure is great TweenInfo.new is one of the only
-// APIs that doesn't automatically cast enums
-const castToEnum = <T extends Enum, K extends keyof Omit<T, "GetEnumItems">>(
-	enumObject: T,
-	enumItem: EnumItem | K | undefined,
-) => (typeIs(enumItem, "string") ? enumObject[enumItem] : enumItem);
+const castToName = (item?: EnumItem | string) =>
+	item !== undefined ? (typeIs(item, "string") ? item : item.Name) : undefined;
 
 function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = [];
@@ -64,31 +60,23 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			});
 		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));
 
-		let ease = transition.ease ?? easingFunction;
-		if (ease === undefined && easingStyle === undefined && easingDirection === undefined) ease = "linear";
+		const ease =
+			transition.ease ?? easingFunction ?? tostring(easingStyle) === "Linear"
+				? "linear"
+				: (`ease${castToName(easingStyle) ?? "Quad"}${castToName(easingDirection) ?? "InOut"}` as Easing);
 
-		if (ease) {
-			if (typeIs(ease, "string")) {
-				const preset = easings[ease];
-				preset[1] ? createNative(...preset[1]) : createBezier(preset[0]);
-			} else if (t.array(t.number)(ease)) {
-				// it's preferable to use a native tween, so we search through easings to see
-				// if the provided easing function has a native equivalent and use that instead
-				// eslint-disable-next-line
+		if (typeIs(ease, "string")) {
+			const preset = easings[ease];
+			preset[1] ? createNative(...preset[1]) : createBezier(preset[0]);
+		} else if (t.array(t.number)(ease)) {
+			// it's preferable to use a native tween, so we search through easings to see
+			// if the provided easing function has a native equivalent and use that instead
+			// eslint-disable-next-line
 				for (const [, [easingFunction, native]] of ipairs(Object.values(easings))) 
-					if (easingFunction && native && Object.deepEquals(ease, easingFunction))
-						return createNative(...native);
+				if (easingFunction && native && Object.deepEquals(ease, easingFunction)) return createNative(...native);
 
-				createBezier(ease);
-			} else createCustom(ease);
-		}
-		// ! legacy
-		else
-			createNative(
-				(castToEnum(Enum.EasingStyle, easingStyle) as Enum.EasingStyle) ?? Enum.EasingStyle.Linear,
-				(castToEnum(Enum.EasingDirection, easingDirection) as Enum.EasingDirection) ??
-					Enum.EasingDirection.InOut,
-			);
+			createBezier(ease);
+		} else createCustom(ease);
 	});
 
 	tweens.forEach((tween) => (tween.tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
