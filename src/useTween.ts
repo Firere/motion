@@ -127,10 +127,11 @@ export default function <T extends Instance>(
 
 	// animate
 	useEffect(() => {
-		if (ref.current) {
-			initialTweenDestructor?.();
-			return tween(ref.current, targets);
-		}
+		const element = ref.current;
+		if (!element) return;
+
+		initialTweenDestructor?.();
+		return tween(element, targets);
 	}, [ref, variants, variantState, animate, transition]);
 
 	return [typeIs(variantState, "string") ? variantState : "", setVariantState];
