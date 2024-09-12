@@ -27,17 +27,8 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			reverses: false,
 			delay: 0,
 		};
-		const {
-			duration,
-			easingStyle,
-			easingDirection,
-			easingFunction,
-			repeat,
-			repeatCount,
-			reverses,
-			delay,
-			callback,
-		} = transition;
+		const { duration, easingStyle, easingDirection, easingFunction, repeatCount, reverses, delay, callback } =
+			transition;
 
 		const properties = { ...target, transition: undefined };
 		const createNative = (style: Enum.EasingStyle, direction: Enum.EasingDirection) => {
@@ -47,7 +38,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 					duration ?? 1,
 					style,
 					direction,
-					repeat ?? repeatCount ?? 0,
+					transition.repeat ?? repeatCount ?? 0,
 					reverses ?? false,
 					delay ?? 0,
 				),
@@ -63,7 +54,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 					{
 						time: duration ?? 1,
 						easing,
-						repeatCount: repeat ?? repeatCount ?? 0,
+						repeatCount: transition.repeat ?? repeatCount ?? 0,
 						reverses: reverses ?? false,
 						delayTime: delay ?? 0,
 						callback,
