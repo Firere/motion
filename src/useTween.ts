@@ -74,7 +74,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));
 
 		let ease = transition.ease ?? easingFunction;
-		if (easingStyle === undefined && easingDirection === undefined) ease ??= "linear";
+		if (ease === undefined && easingStyle === undefined && easingDirection === undefined) ease = "linear";
 
 		if (ease) {
 			if (typeIs(ease, "string")) {
