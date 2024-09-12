@@ -66,8 +66,8 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				: (`ease${castToName(easingStyle) ?? "Quad"}${castToName(easingDirection) ?? "InOut"}` as Easing);
 
 		if (typeIs(ease, "string")) {
-			const preset = easings[ease];
-			preset[1] ? createNative(...preset[1]) : createBezier(preset[0]);
+			const [bezier, native] = easings[ease];
+			native ? createNative(...native) : createBezier(bezier);
 		} else if (t.array(t.number)(ease)) {
 			// it's preferable to use a native tween, so we search through easings to see
 			// if the provided easing function has a native equivalent and use that instead
