@@ -63,7 +63,7 @@ export default ({
 	}, []);
 
 	const connect = useCallback(() => {
-		if (connection.current !== undefined) return;
+		if (connection.current) return;
 		secondsElapsed.current = 0;
 
 		connection.current = RunService.Heartbeat.Connect((deltaTime) => {

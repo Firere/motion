@@ -53,7 +53,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		let ease = transition.ease ?? easingFunction;
 		if (easingStyle === undefined && easingDirection === undefined) ease ??= "linear";
 
-		if (ease !== undefined) {
+		if (ease) {
 			if (typeIs(ease, "string")) {
 				const preset = easings[ease];
 				preset[1] ? createNative(...preset[1]) : createBezier(preset[0]);
@@ -110,7 +110,7 @@ export default function <T extends Instance>(
 	let initialTweenDestructor: (() => void) | undefined;
 	useEffect(() => {
 		const element = ref.current;
-		if (element === undefined) return;
+		if (!element) return;
 
 		// ? this means callbacks don't get run because `tween` is never run, which might be unexpected
 		const applyProperties = (properties: Target<T>) => {
@@ -130,7 +130,7 @@ export default function <T extends Instance>(
 
 	// animate
 	useEffect(() => {
-		if (ref.current !== undefined) {
+		if (ref.current) {
 			initialTweenDestructor?.();
 			return tween(ref.current, targets);
 		}
