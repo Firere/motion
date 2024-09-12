@@ -51,7 +51,7 @@ return (
       // each of these are also their respective defaults
       duration: 1,
       ease: "linear",
-      repeatCount: 0, // -1 for infinity
+      repeat: 0, // -1 for infinity
       reverse: false,
       delay: 0,
     }}  
@@ -187,7 +187,7 @@ const buttonVariants = {
     transition={{ 
       duration: 1, // overrides 20
       ease: "easeInQuad", // overrides `easeInOutQuint`
-      repeatCount: 2, // unique to the `default` variant
+      repeat: 2, // unique to the `default` variant
     }}
   },
 };

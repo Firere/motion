@@ -15,7 +15,7 @@ const transition: Transition = {
   duration: 1,
   ease: "linear",
   reverses: false,
-  repeatCount: 0,
+  repeat: 0,
   delay: 0,
 }
 ```
@@ -27,7 +27,7 @@ Here's what each of these mean:
 | `duration` | How long, in seconds, your tween should take to go from the object's current properties to those defined in your target. |
 | `ease` | Defines the rate of change of your properties over time — more on those later. |
 | `reverses` | Determines if your tween should play itself in reverse after it's reached the target's properties. |
-| `repeatCount` | Determines how many times your tween should play. If `reverses` is set to `true`, then both the initial tween to the target and the reversed tween count as one "repeat", otherwise the object's properties get instantly reset to what they were at the beginning of the tween after each repeat. |
+| `repeat` | Determines how many times your tween should play. If `reverses` is set to `true`, then both the initial tween to the target and the reversed tween count as one "repeat", otherwise the object's properties get instantly reset to what they were at the beginning of the tween after each repeat. |
 | `delay` | How long, in seconds, the tween should wait before playing. |
 
 ## Easings

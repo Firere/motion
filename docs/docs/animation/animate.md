@@ -118,7 +118,7 @@ return (
 
 Wonderful! Now we have a tooltip-like component which has an appearing-upwards effect.
 
-To make it keep playing so we can continue tweaking this to our liking, we can temporarily set `repeatCount` in the transition to some high number:
+To make it keep playing so we can continue tweaking this to our liking, we can temporarily set `repeat` in the transition to some high number:
 
 ```ts
 const target: Target<Frame> = {
@@ -129,7 +129,7 @@ const target: Target<Frame> = {
     ease: "easeOutQuint",
     delay: 1,
     // highlight-next-line
-    repeatCount: 999,
+    repeat: 999,
   },
 }
 ```
