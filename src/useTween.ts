@@ -83,17 +83,12 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			} else if (t.array(t.number)(ease)) {
 				// it's preferable to use a native tween, so we search through easings to see
 				// if the provided easing function has a native equivalent and use that instead
-				let foundNativeEquivalent = false;
 				// eslint-disable-next-line
-				for (const [, [easingFunction, native]] of ipairs(Object.values(easings))) {
-					if (easingFunction && native && Object.deepEquals(ease, easingFunction)) {
-						createNative(...native);
-						foundNativeEquivalent = true;
-						break;
-					}
-				}
+				for (const [, [easingFunction, native]] of ipairs(Object.values(easings))) 
+					if (easingFunction && native && Object.deepEquals(ease, easingFunction))
+						return createNative(...native);
 
-				if (!foundNativeEquivalent) createBezier(ease);
+				createBezier(ease);
 			} else createCustom(ease);
 		}
 		// ! legacy
