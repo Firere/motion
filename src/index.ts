@@ -23,6 +23,10 @@ export interface Transition {
 	 */
 	easingFunction?: BezierDefinition;
 	reverses?: boolean;
+	repeat?: number;
+	/**
+	 * @deprecated replace with `repeat`
+	 */
 	repeatCount?: number;
 	delay?: number;
 	callback?: Callback;

@@ -2,7 +2,7 @@ import Object from "@rbxts/object-utils";
 import React, { useEffect, useMemo, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
-import type { AnimationProps, BezierDefinition, CastsToTargets, Target } from ".";
+import type { AnimationProps, BezierDefinition, CastsToTargets, Target, Transition } from ".";
 import Bezier from "./cubic-bezier";
 import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
 import easings from "./easings";
@@ -19,22 +19,38 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = [];
 
 	targets.forEach((target) => {
-		const transition = target.transition ?? {
+		const transition: Transition = target.transition ?? {
 			// explicitly defines defaults in case either `TweenInfo` or `CustomTween` change their own defaults
 			duration: 1,
 			ease: "linear",
-			repeatCount: 0,
+			repeat: 0,
 			reverses: false,
 			delay: 0,
 		};
-		const { duration, easingStyle, easingDirection, easingFunction, repeatCount, reverses, delay, callback } =
-			transition;
+		const {
+			duration,
+			easingStyle,
+			easingDirection,
+			easingFunction,
+			repeat,
+			repeatCount,
+			reverses,
+			delay,
+			callback,
+		} = transition;
 
 		const properties = { ...target, transition: undefined };
 		const createNative = (style: Enum.EasingStyle, direction: Enum.EasingDirection) => {
 			const tween = TweenService.Create(
 				instance,
-				new TweenInfo(duration ?? 1, style, direction, repeatCount ?? 0, reverses ?? false, delay ?? 0),
+				new TweenInfo(
+					duration ?? 1,
+					style,
+					direction,
+					repeat ?? repeatCount ?? 0,
+					reverses ?? false,
+					delay ?? 0,
+				),
 				properties,
 			);
 			tweens.push({ tween, callback });
@@ -44,7 +60,14 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			tweens.push({
 				tween: new CustomTween(
 					instance,
-					{ time: duration, easing, repeatCount, reverses, delayTime: delay, callback },
+					{
+						time: duration ?? 1,
+						easing,
+						repeatCount: repeat ?? repeatCount ?? 0,
+						reverses: reverses ?? false,
+						delayTime: delay ?? 0,
+						callback,
+					},
 					properties,
 				),
 			});
