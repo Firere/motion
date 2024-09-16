@@ -81,7 +81,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 export default function <T extends Instance>(
 	ref: React.RefObject<T>,
 	{ animate, initial, transition, variants }: AnimationProps<T>,
-): [string, (variant: string) => void] {
+): [CastsToTargets<T> | undefined, (variant?: CastsToTargets<T>) => void] {
 	const [variantState, setVariantState] = useState<CastsToTargets<T>>();
 
 	const utility = useMemo(() => new TargetUtility(transition, variants), [transition, variants]);
@@ -125,5 +125,5 @@ export default function <T extends Instance>(
 		return tween(element, targets);
 	}, [ref, variants, variantState, animate, transition]);
 
-	return [typeIs(variantState, "string") ? variantState : "", setVariantState];
+	return [variantState, setVariantState];
 }
