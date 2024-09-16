@@ -9,14 +9,8 @@ export type Easing =
 			| "Circ"
 			| "Expo"}`;
 
-const cast = (
-	easingDirection: CastsToEnum<Enum.EasingDirection> & string,
-	easingStyle: CastsToEnum<Enum.EasingStyle> & string,
-) =>
-	[Enum.EasingStyle[easingStyle as never], Enum.EasingDirection[easingDirection as never]] as [
-		Enum.EasingStyle,
-		Enum.EasingDirection,
-	];
+const cast = (direction: Enum.EasingDirection["Name"], style: Enum.EasingStyle["Name"]) =>
+	[Enum.EasingStyle[style], Enum.EasingDirection[direction]] as const;
 
 const easings: Record<
 	Easing,
