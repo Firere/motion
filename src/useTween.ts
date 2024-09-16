@@ -8,8 +8,7 @@ import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
 import easings, { Easing } from "./easings";
 import TargetUtility, { defaultTransition } from "./TargetUtility";
 
-const castToName = (item?: EnumItem | string) =>
-	item !== undefined ? (typeIs(item, "string") ? item : item.Name) : undefined;
+const castToName = (item: EnumItem | string) => (typeIs(item, "string") ? item : item.Name);
 
 function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = [];
@@ -46,12 +45,16 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			});
 		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));
 
+		const style = castToName(easingStyle ?? "Quad");
 		const ease: Transition["ease"] =
 			transition.ease ??
 			easingFunction ??
 			(tostring(easingStyle ?? "Linear") === "Linear"
 				? "linear"
-				: (`ease${castToName(easingStyle) ?? "Quad"}${castToName(easingDirection) ?? "InOut"}` as Easing));
+				: // ugly ternary! but this is going to be removed anyway
+				  (`ease${style === "Circular" ? "Circ" : style === "Exponential" ? "Expo" : style}${castToName(
+						easingDirection ?? "InOut",
+				  )}` as Easing));
 
 		if (typeIs(ease, "string")) {
 			const [bezier, native] = easings[ease];
