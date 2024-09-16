@@ -15,7 +15,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = [];
 
 	targets.forEach((target) => {
-		const transition: Transition = target.transition ?? defaultTransition;
+		const transition = { ...defaultTransition, ...target.transition };
 		const { duration, easingStyle, easingDirection, easingFunction, repeatCount, reverses, delay, callback } =
 			transition;
 
@@ -24,12 +24,12 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			const tween = TweenService.Create(
 				instance,
 				new TweenInfo(
-					duration ?? defaultTransition.duration,
+					duration,
 					style,
 					direction,
 					transition.repeat ?? repeatCount ?? defaultTransition.repeat,
-					reverses ?? defaultTransition.reverses,
-					delay ?? defaultTransition.delay,
+					reverses,
+					delay,
 				),
 				properties,
 			);
@@ -41,11 +41,11 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				tween: new CustomTween(
 					instance,
 					{
-						time: duration ?? defaultTransition.duration,
+						time: duration,
 						easing,
 						repeatCount: transition.repeat ?? repeatCount ?? defaultTransition.repeat,
-						reverses: reverses ?? defaultTransition.reverses,
-						delayTime: delay ?? defaultTransition.delay,
+						reverses,
+						delayTime: delay,
 						callback,
 					},
 					properties,
