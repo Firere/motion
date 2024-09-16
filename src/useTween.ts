@@ -74,11 +74,11 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		} else createCustom(ease);
 	});
 
-	tweens.forEach((tween) => (tween.tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
+	tweens.forEach(({ tween }) => (tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
 	return () =>
-		tweens.forEach((tween) => {
-			tween.callback?.(tween.tween.PlaybackState);
-			(tween.tween as Tween).Destroy();
+		tweens.forEach(({ tween, callback }) => {
+			callback?.(tween.PlaybackState);
+			(tween as Tween).Destroy();
 		});
 }
 
