@@ -62,8 +62,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		} else if (t.array(t.number)(ease)) {
 			// it's preferable to use a native tween, so we search through easings to see
 			// if the provided easing function has a native equivalent and use that instead
-			// eslint-disable-next-line
-			for (const [, [bezier, native]] of ipairs(Object.values(easings))) 
+			for (const [, [bezier, native]] of pairs(easings))
 				if (bezier && native && Object.deepEquals(ease, bezier)) return createNative(...native);
 
 			createBezier(ease);
