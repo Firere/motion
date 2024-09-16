@@ -5,11 +5,14 @@ import type { Callback } from "./CustomTween/src";
 
 // I wanted to decompose a bit of `useTween` and ended up mixing functional and OOP. extremely cursed! but it works better imo
 
-export const defaultTransition: Transition = {
+// `ease` and `repeat` are undefined because of backwards compatibility
+export const defaultTransition: Transition & {
+	duration: 1;
+	reverses: false;
+	delay: 0;
+} = {
 	// explicitly defines defaults in case either `TweenInfo` or `CustomTween` change their own defaults
 	duration: 1,
-	ease: "linear",
-	repeat: 0,
 	reverses: false,
 	delay: 0,
 };
