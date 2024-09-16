@@ -1,0 +1,23 @@
+{
+	"name": "React Motion",
+	"globIgnorePaths": ["out/CustomTween/*.json"],
+	"tree": {
+		"$className": "DataModel",
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"$ignoreUnknownInstances": true,
+			"Motion": {
+				"$path": "out"
+			},
+			"rbxts_include": {
+				"$path": "include",
+				"node_modules": {
+					"$className": "Folder",
+					"@rbxts": {
+						"$path": "node_modules/@rbxts"
+					}
+				}
+			}
+		}
+	}
+}
