@@ -63,7 +63,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		const ease: Transition["ease"] =
 			transition.ease ??
 			easingFunction ??
-			(tostring(easingStyle) === "Linear"
+			(tostring(easingStyle ?? "Linear") === "Linear"
 				? "linear"
 				: (`ease${castToName(easingStyle) ?? "Quad"}${castToName(easingDirection) ?? "InOut"}` as Easing));
 
