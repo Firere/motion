@@ -61,9 +61,11 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));
 
 		const ease: Transition["ease"] =
-			transition.ease ?? easingFunction ?? tostring(easingStyle) === "Linear"
+			transition.ease ??
+			easingFunction ??
+			(tostring(easingStyle) === "Linear"
 				? "linear"
-				: (`ease${castToName(easingStyle) ?? "Quad"}${castToName(easingDirection) ?? "InOut"}` as Easing);
+				: (`ease${castToName(easingStyle) ?? "Quad"}${castToName(easingDirection) ?? "InOut"}` as Easing));
 
 		if (typeIs(ease, "string")) {
 			const [bezier, native] = easings[ease];
