@@ -6,7 +6,7 @@ import type { AnimationProps, BezierDefinition, CastsToTargets, Target, Transiti
 import Bezier from "./cubic-bezier";
 import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
 import easings, { Easing } from "./easings";
-import TargetUtility from "./TargetUtility";
+import TargetUtility, { defaultTransition } from "./TargetUtility";
 
 const castToName = (item?: EnumItem | string) =>
 	item !== undefined ? (typeIs(item, "string") ? item : item.Name) : undefined;
@@ -15,14 +15,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = [];
 
 	targets.forEach((target) => {
-		const transition: Transition = target.transition ?? {
-			// explicitly defines defaults in case either `TweenInfo` or `CustomTween` change their own defaults
-			duration: 1,
-			ease: "linear",
-			repeat: 0,
-			reverses: false,
-			delay: 0,
-		};
+		const transition: Transition = target.transition ?? defaultTransition;
 		const { duration, easingStyle, easingDirection, easingFunction, repeatCount, reverses, delay, callback } =
 			transition;
 
@@ -31,12 +24,12 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			const tween = TweenService.Create(
 				instance,
 				new TweenInfo(
-					duration ?? 1,
+					duration ?? defaultTransition.duration,
 					style,
 					direction,
-					transition.repeat ?? repeatCount ?? 0,
-					reverses ?? false,
-					delay ?? 0,
+					transition.repeat ?? repeatCount ?? defaultTransition.repeat,
+					reverses ?? defaultTransition.reverses,
+					delay ?? defaultTransition.delay,
 				),
 				properties,
 			);
@@ -48,11 +41,11 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				tween: new CustomTween(
 					instance,
 					{
-						time: duration ?? 1,
+						time: duration ?? defaultTransition.duration,
 						easing,
-						repeatCount: transition.repeat ?? repeatCount ?? 0,
-						reverses: reverses ?? false,
-						delayTime: delay ?? 0,
+						repeatCount: transition.repeat ?? repeatCount ?? defaultTransition.repeat,
+						reverses: reverses ?? defaultTransition.reverses,
+						delayTime: delay ?? defaultTransition.delay,
 						callback,
 					},
 					properties,
