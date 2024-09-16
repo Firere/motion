@@ -3,39 +3,11 @@ import type { BezierDefinition } from ".";
 export type Easing =
 	| "linear"
 	| "ease"
-	| "easeIn"
-	| "easeOut"
-	| "easeInOut"
-	| "easeInSine"
-	| "easeOutSine"
-	| "easeInOutSine"
-	| "easeInQuad"
-	| "easeOutQuad"
-	| "easeInOutQuad"
-	| "easeInCubic"
-	| "easeOutCubic"
-	| "easeInOutCubic"
-	| "easeInQuart"
-	| "easeOutQuart"
-	| "easeInOutQuart"
-	| "easeInQuint"
-	| "easeOutQuint"
-	| "easeInOutQuint"
-	| "easeInExpo"
-	| "easeOutExpo"
-	| "easeInOutExpo"
-	| "easeInCirc"
-	| "easeOutCirc"
-	| "easeInOutCirc"
-	| "easeInBack"
-	| "easeOutBack"
-	| "easeInOutBack"
-	| "easeInElastic"
-	| "easeOutElastic"
-	| "easeInOutElastic"
-	| "easeInBounce"
-	| "easeOutBounce"
-	| "easeInOutBounce";
+	| `ease${Enum.EasingDirection["Name"]}`
+	| `ease${Enum.EasingDirection["Name"]}${
+			| Exclude<Enum.EasingStyle["Name"], "Circular" | "Exponential" | "Linear">
+			| "Circ"
+			| "Expo"}`;
 
 const cast = (
 	easingDirection: CastsToEnum<Enum.EasingDirection> & string,
