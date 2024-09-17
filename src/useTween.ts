@@ -1,11 +1,12 @@
 import Object from "@rbxts/object-utils";
-import React, { useEffect, useMemo, useState } from "@rbxts/react";
+import React, { useContext, useEffect, useMemo, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
 import { t } from "@rbxts/t";
 import type { AnimationProps, BezierDefinition, CastsToTargets, Target, Transition } from ".";
 import Bezier from "./cubic-bezier";
 import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
 import easings, { Easing } from "./easings";
+import PresenceContext from "./Presence/PresenceContext";
 import TargetUtility, { defaultTransition } from "./TargetUtility";
 
 const castToName = (item: EnumItem | string) => (typeIs(item, "string") ? item : item.Name);
@@ -45,11 +46,11 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			});
 		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));
 
-		const style = castToName(easingStyle ?? "Quad");
+		const style = castToName(easingStyle ?? "Linear");
 		const ease: Transition["ease"] =
 			transition.ease ??
 			easingFunction ??
-			(tostring(style ?? "Linear") === "Linear"
+			(style === "Linear"
 				? "linear"
 				: // ugly ternary! but this is going to be removed anyway
 				  (`ease${style === "Circular" ? "Circ" : style === "Exponential" ? "Expo" : style}${castToName(
@@ -79,11 +80,13 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 
 export default function <T extends Instance>(
 	ref: React.RefObject<T>,
-	{ animate, initial, transition, variants }: AnimationProps<T>,
+	{ animate, exit, initial, transition, variants }: AnimationProps<T>,
 ): [CastsToTargets<T> | undefined, (variant?: CastsToTargets<T>) => void] {
 	const [variantState, setVariantState] = useState<CastsToTargets<T>>();
 
 	const utility = useMemo(() => new TargetUtility(transition, variants), [transition, variants]);
+
+	const presenceContext = useContext(PresenceContext);
 
 	/**
 	 * ? variantState is overridden by the `animate` prop,
