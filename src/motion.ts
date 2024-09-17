@@ -18,7 +18,7 @@ function excludeKeys<T extends object>(object: T, ...keys: string[]) {
 export function createMotionComponent<K extends keyof CreatableInstances>(elementType: K) {
 	type T = CreatableInstances[K];
 	return React.forwardRef((props: React.InstanceProps<T> & AnimationProps<T>, forwardedRef?: React.Ref<T>) => {
-		const { initial, animate, transition, variants } = props;
+		const { animate, initial, transition, variants } = props;
 		const ref = (forwardedRef as React.RefObject<T>) ?? React.createRef<T>();
 		useTween(ref, { animate, initial, transition, variants });
 
