@@ -56,6 +56,9 @@ export type CastsToTargets<T extends Instance> = CastsToTarget<T> | CastsToTarge
 
 export interface AnimationProps<T extends Instance> {
 	animate?: CastsToTargets<T>;
+	/**
+	 * @hidden not yet implemented
+	 */
 	exit?: CastsToTargets<T>;
 	initial?: CastsToTargets<T> | boolean;
 	transition?: Transition;
