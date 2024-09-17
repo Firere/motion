@@ -49,7 +49,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		const ease: Transition["ease"] =
 			transition.ease ??
 			easingFunction ??
-			(tostring(easingStyle ?? "Linear") === "Linear"
+			(tostring(style ?? "Linear") === "Linear"
 				? "linear"
 				: // ugly ternary! but this is going to be removed anyway
 				  (`ease${style === "Circular" ? "Circ" : style === "Exponential" ? "Expo" : style}${castToName(
