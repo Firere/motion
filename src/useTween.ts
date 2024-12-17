@@ -47,15 +47,16 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));
 
 		const style = castToName(easingStyle ?? "Linear");
+		const direction = castToName(easingDirection ?? "InOut");
 		const ease: Transition["ease"] =
 			transition.ease ??
 			easingFunction ??
 			(style === "Linear"
 				? "linear"
 				: // ugly ternary! but this is going to be removed anyway
-				  (`ease${style === "Circular" ? "Circ" : style === "Exponential" ? "Expo" : style}${castToName(
-						easingDirection ?? "InOut",
-				  )}` as Easing));
+				  (("ease" +
+						(style === "Circular" || style === "Exponential" ? style.sub(1, 4) : style) +
+						direction) as Easing));
 
 		if (typeIs(ease, "string")) {
 			const [bezier, native] = easings[ease];
