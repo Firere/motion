@@ -55,8 +55,8 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				? "linear"
 				: // ugly ternary! but this is going to be removed anyway
 				  (("ease" +
-						(style === "Circular" || style === "Exponential" ? style.sub(1, 4) : style) +
-						direction) as Easing));
+						direction +
+						(style === "Circular" || style === "Exponential" ? style.sub(1, 4) : style)) as Easing));
 
 		if (typeIs(ease, "string")) {
 			const [bezier, native] = easings[ease];
