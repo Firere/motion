@@ -46,7 +46,7 @@ export default class TargetUtility<T extends Instance> {
 		if (typeIs(targetOrVariant, "table")) return targetOrVariant;
 
 		const variant = targetOrVariant;
-		assert(this.variants, `Variant "${variant}" cannot be set because no variants have been set`);
+		assert(this.variants, `Variant "${variant}" cannot be set because no variants have been defined`);
 		assert(
 			variant in this.variants,
 			`Variant "${tostring(variant)}" is invalid: ${Object.keys(this.variants).join(", ")}`,
