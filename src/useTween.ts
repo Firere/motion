@@ -57,15 +57,8 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		if (typeIs(ease, "string")) {
 			const [bezier, native] = easings[ease];
 			return native ? createNative(...native) : createBezier(bezier);
-		} else if (typeIs(ease, "function")) return createCustom(ease);
-		else {
-			// it's preferable to use a native tween, so we search through easings to see
-			// if the provided easing function has a native equivalent and use that instead
-			for (const [, [bezier, native]] of pairs(easings))
-				if (bezier && native && Object.deepEquals(ease, bezier)) return createNative(...native);
-
-			return createBezier(ease);
 		}
+		return typeIs(ease, "function") ? createCustom(ease) : createBezier(ease);
 	});
 
 	tweens.forEach(({ tween }) => (tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
