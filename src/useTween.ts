@@ -1,7 +1,6 @@
 import Object from "@rbxts/object-utils";
 import React, { useContext, useEffect, useMemo, useState } from "@rbxts/react";
 import { TweenService } from "@rbxts/services";
-import { t } from "@rbxts/t";
 import type { AnimationProps, BezierDefinition, CastsToTargets, Target, Transition } from ".";
 import Bezier from "./cubic-bezier";
 import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
@@ -58,14 +57,15 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		if (typeIs(ease, "string")) {
 			const [bezier, native] = easings[ease];
 			return native ? createNative(...native) : createBezier(bezier);
-		} else if (t.array(t.number)(ease)) {
+		} else if (typeIs(ease, "function")) return createCustom(ease);
+		else {
 			// it's preferable to use a native tween, so we search through easings to see
 			// if the provided easing function has a native equivalent and use that instead
 			for (const [, [bezier, native]] of pairs(easings))
 				if (bezier && native && Object.deepEquals(ease, bezier)) return createNative(...native);
 
 			return createBezier(ease);
-		} else return createCustom(ease);
+		}
 	});
 
 	tweens.forEach(({ tween }) => (tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
