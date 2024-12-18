@@ -12,9 +12,7 @@ import TargetUtility, { defaultTransition } from "./TargetUtility";
 const castToName = (item: EnumItem | string) => (typeIs(item, "string") ? item : item.Name);
 
 function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
-	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = [];
-
-	targets.forEach((target) => {
+	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = targets.map((target) => {
 		const transition = { ...defaultTransition, ...target.transition };
 		const { duration, easingStyle, easingDirection, easingFunction, repeatCount, reverses, delay, callback } =
 			transition;
@@ -26,24 +24,23 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				new TweenInfo(duration, style, direction, transition.repeat ?? repeatCount ?? 0, reverses, delay),
 				properties,
 			);
-			tweens.push({ tween, callback });
 			if (callback) tween.Completed.Connect(callback);
+			return { tween, callback };
 		};
-		const createCustom = (easing: EasingFunction) =>
-			tweens.push({
-				tween: new CustomTween(
-					instance,
-					{
-						time: duration,
-						easing,
-						repeatCount: transition.repeat ?? repeatCount ?? 0,
-						reverses,
-						delayTime: delay,
-						callback,
-					},
-					properties,
-				),
-			});
+		const createCustom = (easing: EasingFunction) => ({
+			tween: new CustomTween(
+				instance,
+				{
+					time: duration,
+					easing,
+					repeatCount: transition.repeat ?? repeatCount ?? 0,
+					reverses,
+					delayTime: delay,
+					callback,
+				},
+				properties,
+			),
+		});
 		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));
 
 		const style = castToName(easingStyle ?? "Linear");
@@ -60,15 +57,15 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 
 		if (typeIs(ease, "string")) {
 			const [bezier, native] = easings[ease];
-			native ? createNative(...native) : createBezier(bezier);
+			return native ? createNative(...native) : createBezier(bezier);
 		} else if (t.array(t.number)(ease)) {
 			// it's preferable to use a native tween, so we search through easings to see
 			// if the provided easing function has a native equivalent and use that instead
 			for (const [, [bezier, native]] of pairs(easings))
 				if (bezier && native && Object.deepEquals(ease, bezier)) return createNative(...native);
 
-			createBezier(ease);
-		} else createCustom(ease);
+			return createBezier(ease);
+		} else return createCustom(ease);
 	});
 
 	tweens.forEach(({ tween }) => (tween as Tween).Play()); // TS complains if I don't do this stupid type assertion
