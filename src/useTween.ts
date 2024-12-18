@@ -44,7 +44,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 
 		const style = castToName(easingStyle ?? "Linear");
 		const direction = castToName(easingDirection ?? "InOut");
-		const ease: Transition["ease"] =
+		const ease =
 			transition.ease ??
 			easingFunction ??
 			(style === "Linear"
