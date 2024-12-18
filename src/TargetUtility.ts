@@ -1,7 +1,6 @@
 import Object from "@rbxts/object-utils";
 import { t } from "@rbxts/t";
 import type { AnimationProps, CastsToTarget, CastsToTargets, Target, Transition } from ".";
-import type { Callback } from "./CustomTween/src";
 
 // I wanted to decompose a bit of `useTween` and ended up mixing functional and OOP. extremely cursed! but it works better imo
 
@@ -30,22 +29,17 @@ export default class TargetUtility<T extends Instance> {
 	public addDefaultTransition(target: Target<T>) {
 		if (!this.defaultTransition) return target;
 		if (!target.transition) return { ...target, transition: this.defaultTransition };
-
-		let callback!: Callback;
-		if (this.defaultTransition.callback && target.transition.callback) {
-			callback = (playbackState) => {
-				// non-null assertions are bad but I've literally just checked both of these,
-				// and I don't want to use optional chaining so as to prevent another check
-				this.defaultTransition!.callback!(playbackState);
-				target.transition!.callback!(playbackState);
-			};
-		} else if (this.defaultTransition.callback) {
-			callback = this.defaultTransition.callback;
-		} else if (target.transition.callback) {
-			callback = target.transition.callback;
-		}
-
-		return { ...target, transition: { ...this.defaultTransition, ...target.transition, callback } };
+		return {
+			...target,
+			transition: {
+				...this.defaultTransition,
+				...target.transition,
+				callback: (playbackState) => {
+					this.defaultTransition?.callback?.(playbackState);
+					target.transition?.callback?.(playbackState);
+				},
+			},
+		} as Target<T>;
 	}
 
 	public castToTarget(targetOrVariant: CastsToTarget<T>) {
