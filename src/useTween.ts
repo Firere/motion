@@ -17,15 +17,6 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 			transition;
 
 		const properties = { ...target, transition: undefined };
-		const createNative = (style: Enum.EasingStyle, direction: Enum.EasingDirection) => {
-			const tween = TweenService.Create(
-				instance,
-				new TweenInfo(duration, style, direction, transition.repeat ?? repeatCount ?? 0, reverses, delay),
-				properties,
-			);
-			if (callback) tween.Completed.Connect(callback);
-			return { tween, callback };
-		};
 		const createCustom = (easing: EasingFunction) => ({
 			tween: new CustomTween(
 				instance,
@@ -56,7 +47,17 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 
 		if (typeIs(ease, "string")) {
 			const [bezier, native] = easings[ease];
-			return native ? createNative(...native) : createBezier(bezier);
+
+			if (native) {
+				const [style, direction] = native;
+				const tween = TweenService.Create(
+					instance,
+					new TweenInfo(duration, style, direction, transition.repeat ?? repeatCount ?? 0, reverses, delay),
+					properties,
+				);
+				if (callback) tween.Completed.Connect(callback);
+				return { tween, callback };
+			} else return createBezier(bezier);
 		}
 		return typeIs(ease, "function") ? createCustom(ease) : createBezier(ease);
 	});
