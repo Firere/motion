@@ -86,6 +86,9 @@ export default function <T extends Instance>(
 	ref: React.RefObject<T>,
 	{ animate, exit, initial, transition, variants }: AnimationProps<T>,
 ): [CastsToTargets<T> | undefined, (variant?: CastsToTargets<T>) => void] {
+	/**
+	 * @deprecated
+	 */
 	const [variantState, setVariantState] = useState<CastsToTargets<T>>();
 
 	const utility = useMemo(() => new TargetUtility(transition, variants), [transition, variants]);
@@ -135,5 +138,12 @@ export default function <T extends Instance>(
 		return tween(element, targets);
 	}, [ref, variants, variantState, animate, transition]);
 
-	return [variantState, setVariantState];
+	return [
+		variantState,
+		(variant) => {
+			if (animate !== undefined) warn("`animate` prop overrides internal target state.");
+			warn("`variant` and `setVariant` have been deprecated in favour of setting the `animate` prop.");
+			setVariantState(variant);
+		},
+	];
 }

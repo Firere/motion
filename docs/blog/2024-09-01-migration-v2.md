@@ -61,6 +61,18 @@ const transition: Transition = {
 
 The `useAnimation` hook has been renamed to `useTween` in the effort of more clearly defining Motion's concepts, both in the docs and in the code. `useAnimation` is still exported, but marked as deprecated and as such will be ~~struck-through~~. All you need to do to migrate this is to switch out `useAnimation` with `useTween`.
 
+## `variant` and `setVariant` -> `animate` prop
+
+The internal state returned by `useTween` and the `animate` prop are two different ways of achieving exactly the same thing and it only creates confusion to keep support for `variant` and `setVariant` around. If you previously relied on these, a quick and easy method of switching without needing to refactor much could be something like:
+
+```ts
+// before
+const [variant, setVariant] = useTween(ref, {});
+// after
+const [variant, setVariant] = useState<CastsToTarget<GuiObject>>();
+useTween(ref, { animate: variant });
+```
+
 ## `CastsToTarget` and `CastsToTargets` Types
 
 `CastsToTarget` has been renamed to `CastsToTargets` to reflect that it can be an array of targets. Code previously using `CastsToTarget` will not work.

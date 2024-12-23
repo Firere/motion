@@ -409,11 +409,13 @@ export = (target: Instance) => {
 
 ## useTween
 
-That's not all Motion has to offer, though! If you'd like, you can use the `useTween` hook provided by motion. This allows you to animate any component in your codebase without having to use `motion` or the `animate` prop, as it returns a setter for the variant:
+That's not all Motion has to offer, though! If you'd like, you can use the `useTween` hook provided by Motion. This allows you to animate any component in your codebase without having to use the `motion` object:
 
 ```tsx
 const ref = useRef<Frame>();
-const [variant, setVariant] = useTween(ref, {
+const [hovering, setHovering] = useState(false);
+useTween(ref, {
+  animate: hovering ? "hover" : "default",
   initial: "default",
   transition: {
     duration: 3,
@@ -435,14 +437,12 @@ const [variant, setVariant] = useTween(ref, {
   },
 });
 
-useEffect(() => print("Variant changed:", variant), [variant]);
-
 return (
   <frame
     BackgroundColor3={new Color3(1, 0, 0)}
     Event={{ 
-      MouseEnter: () => setVariant("hover"),
-      MouseLeave: () => setVariant("default"),
+      MouseEnter: () => setHovering(true),
+      MouseLeave: () => setHovering(false),
     }}
     ref={ref}
   />
