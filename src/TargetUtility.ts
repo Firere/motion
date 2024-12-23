@@ -26,7 +26,7 @@ export default class TargetUtility<T extends Instance> {
 		this.variants = variants;
 	}
 
-	public addDefaultTransition(target: Target<T>) {
+	public addDefaultTransition(target: Target<T>): Target<T> {
 		if (!this.defaultTransition) return target;
 		if (!target.transition) return { ...target, transition: this.defaultTransition };
 		return {
@@ -39,7 +39,7 @@ export default class TargetUtility<T extends Instance> {
 					target.transition?.callback?.(playbackState);
 				},
 			},
-		} as Target<T>;
+		};
 	}
 
 	public castToTarget(targetOrVariant: CastsToTarget<T>) {
@@ -74,11 +74,8 @@ export default class TargetUtility<T extends Instance> {
 		for (let i = resolved.size() - 1; i >= 0; i--)
 			for (const [key] of pairs(resolved[i] as object)) {
 				if (key === "transition") continue;
-				if (alreadyModified.has(key as never)) {
-					delete resolved[i][key as never];
-				} else {
-					alreadyModified.add(key as never);
-				}
+				if (alreadyModified.has(key as never)) delete resolved[i][key as never];
+				else alreadyModified.add(key as never);
 			}
 
 		return resolved;
