@@ -4,11 +4,17 @@ import { TweenService } from "@rbxts/services";
 import type { AnimationProps, BezierDefinition, CastsToTargets, Target, Transition } from ".";
 import Bezier from "./cubic-bezier";
 import CustomTween, { Callback, EasingFunction } from "./CustomTween/src";
-import easings, { Easing } from "./easings";
-import PresenceContext from "./Presence/PresenceContext";
+import easings, { Easing, NativeTweenDefinition } from "./easings";
 import TargetUtility, { defaultTransition } from "./TargetUtility";
 
 const castToName = (item: EnumItem | string) => (typeIs(item, "string") ? item : item.Name);
+const isNative = (easing: BezierDefinition | NativeTweenDefinition): easing is NativeTweenDefinition =>
+	easing.size() === 2;
+
+interface TweenController {
+	destroy: () => void;
+	play: () => void;
+}
 
 function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = targets.map((target) => {
@@ -61,10 +67,10 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		})();
 
 		if (typeIs(ease, "string")) {
-			const [bezier, native] = easings[ease];
+			const easing = easings[ease];
 
-			if (native) {
-				const [style, direction] = native;
+			if (isNative(easing)) {
+				const [style, direction] = easing;
 				const tween = TweenService.Create(
 					instance,
 					new TweenInfo(duration, style, direction, repeatCount, reverses, delay),
@@ -72,7 +78,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				);
 				if (callback) tween.Completed.Connect(callback);
 				return { tween, callback };
-			} else return createBezier(bezier);
+			} else return createBezier(easing);
 		}
 		return typeIs(ease, "function") ? createCustom(ease) : createBezier(ease);
 	});
