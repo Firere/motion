@@ -55,7 +55,7 @@ export default class TargetUtility<T extends Instance> {
 	}
 
 	public castToTargets(targets?: CastsToTargets<T>, skipTransition?: boolean) {
-		if (targets === undefined) return undefined;
+		if (targets === undefined) return [];
 
 		const mergeTransitions = (target: CastsToTarget<T>) =>
 			skipTransition ? this.castToTarget(target) : this.addDefaultTransition(this.castToTarget(target));

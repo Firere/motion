@@ -102,7 +102,7 @@ export = () => {
 			const utility = new TargetUtility(undefined, variants);
 			const processed = utility.castToTargets(targets);
 
-			const isEqual = Object.deepEquals(processed!, [
+			const isEqual = Object.deepEquals(processed, [
 				variants.variant1,
 				targets[1],
 				variants.variant2,
@@ -137,7 +137,7 @@ export = () => {
 			];
 			const utility = new TargetUtility(defaultTransition);
 
-			const withDefaultTransition = utility.castToTargets(targets, false)!;
+			const withDefaultTransition = utility.castToTargets(targets, false);
 			expect(withDefaultTransition).to.be.ok();
 
 			withDefaultTransition.forEach(({ transition }) => {
@@ -156,7 +156,7 @@ export = () => {
 
 			expect(number).to.equal(7);
 
-			const withoutDefaultTransition = utility.castToTargets(targets, true)!;
+			const withoutDefaultTransition = utility.castToTargets(targets, true);
 			expect(withoutDefaultTransition).to.be.ok();
 
 			const [first, second, third] = withoutDefaultTransition;

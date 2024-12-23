@@ -128,7 +128,7 @@ export default function <T extends Instance>(
 		if (!typeIs(nonNil, "boolean")) {
 			applyProperties(
 				utility
-					.castToTargets(nonNil, true)!
+					.castToTargets(nonNil, true)
 					.reduce((accumulator, current) => ({ ...accumulator, ...current }), {}),
 			);
 		} else if (nonNil) {
