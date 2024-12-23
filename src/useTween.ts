@@ -13,8 +13,8 @@ const castToName = (item: EnumItem | string) => (typeIs(item, "string") ? item :
 function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = targets.map((target) => {
 		const transition = { ...defaultTransition, ...target.transition };
-		const { duration, easingStyle, easingDirection, easingFunction, repeatCount, reverses, delay, callback } =
-			transition;
+		const { duration, easingStyle, easingDirection, easingFunction, reverses, delay, callback } = transition;
+		const repeatCount = transition.repeat ?? transition.repeatCount ?? 0;
 
 		const properties = { ...target, transition: undefined };
 		const createCustom = (easing: EasingFunction) => ({
