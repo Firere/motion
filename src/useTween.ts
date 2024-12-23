@@ -29,6 +29,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 					callback,
 				},
 				properties,
+				precision,
 			),
 		});
 		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));

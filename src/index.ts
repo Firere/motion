@@ -29,6 +29,7 @@ export interface Transition {
 	 */
 	repeatCount?: number;
 	delay?: number;
+	precision?: number;
 	callback?: Callback;
 }
 

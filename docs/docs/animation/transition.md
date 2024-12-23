@@ -17,7 +17,7 @@ const transition: Transition = {
   reverses: false,
   repeat: 0,
   delay: 0,
-}
+};
 ```
 
 Here's what each of these mean:
@@ -41,7 +41,7 @@ Predefined easings are provided to you by default and are the easiest to use. Si
 ```ts
 const transition: Transition = {
   ease: "easeOutQuint",
-}
+};
 ```
 
 There are far too many predefined easings to list here, but all the ones available on [easings.net](https://easings.net/) along with `linear`, `ease`, `easeIn`, `easeOut` and `easeInOut` can be used in Motion.
@@ -59,7 +59,7 @@ Motion also allows you to use Bézier curves to define your easings, [just as yo
 ```ts
 const transition: Transition = {
   ease: [0.36, -0.64, 0.34, 1.64],
-}
+};
 ```
 
 You can use [this page](https://cubic-bezier.com/) to define Bézier curves using a visual editor.
@@ -71,7 +71,7 @@ On top of all of this, you're able to also just define your own easing functions
 ```ts
 const transition: Transition = {
   ease: (x) => 1 - math.pow(1 - x, 5), // equivalent to `easeOutQuint`
-}
+};
 ```
 
 :::warning
@@ -79,3 +79,22 @@ const transition: Transition = {
 If it's possible to represent your easing function using a predefined easing or a  Bézier curve, as the example above is, then use that instead, since the underlying implementation of Bézier curves is more optimised and uses [native code generation](https://create.roblox.com/docs/luau/native-code-gen) for added speed.
 
 :::
+
+## `precision`
+
+Under the hood, Motion uses 2 different types of tweens: native, Roblox tweens and [`CustomTween`s](https://github.com/Firere/CustomTween). Whereas the implementation of `CustomTween`s involves manually tweening the instance's properties every hundredth of a second (at least, by default) in Lua scripts, native tweens are run by the Roblox engine directly and so are much more performant. Predictably, whenever you pass in a Bézier curve or a custom easing function, Motion will resort to playing a `CustomTween`.
+
+While it's perfectly fine to use these in moderation, overusing `CustomTween`s can lead to severely degraded performance because — as mentioned earlier — instance properties are tweened every hundredth of a second by default. If you want to mitigate the effects of this (though at the cost of precision and making your tweens slightly choppier) Motion exposes another property which you can set in transitions:
+
+```ts
+const transition: Transition = {
+  ease: [0.36, -0.64, 0.34, 1.64],
+  precision: 75,
+};
+```
+
+The `precision` property allows you to set the frequency in updates per second at which instance properties are tweened. For instance, if you pass in 75, it will tween every $\frac{1}{75}$ seconds. As mentioned before, the default value for `precision` is 100.
+
+At the same time, you're also able to make it *more* precise if you want — at the expense of performance — by passing in a greater value. However, the primary purpose of exposing this property is to mitigate the performance costs of running hundreds of tweens in rapid succession, and the default 100 should be more than enough for most animations.
+
+If `precision` is set on a transition that uses a native tween, it will have no effect. To identify transitions which will use a native tween, check that `ease` is both a predefined easing and that it is not `ease`, `easeIn`, `easeInOut` or `easeOut`.
