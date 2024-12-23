@@ -23,7 +23,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				{
 					time: duration,
 					easing,
-					repeatCount: transition.repeat ?? repeatCount ?? 0,
+					repeatCount,
 					reverses,
 					delayTime: delay,
 					callback,
@@ -64,7 +64,7 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 				const [style, direction] = native;
 				const tween = TweenService.Create(
 					instance,
-					new TweenInfo(duration, style, direction, transition.repeat ?? repeatCount ?? 0, reverses, delay),
+					new TweenInfo(duration, style, direction, repeatCount, reverses, delay),
 					properties,
 				);
 				if (callback) tween.Completed.Connect(callback);
