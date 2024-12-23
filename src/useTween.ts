@@ -33,17 +33,29 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 		});
 		const createBezier = (definition: BezierDefinition) => createCustom(new Bezier(...definition));
 
-		const style = castToName(easingStyle ?? "Linear");
-		const direction = castToName(easingDirection ?? "InOut");
-		const ease =
-			transition.ease ??
-			easingFunction ??
-			(style === "Linear"
-				? "linear"
-				: // ugly ternary! but this is going to be removed anyway
-				  (("ease" +
-						direction +
-						(style === "Circular" || style === "Exponential" ? style.sub(1, 4) : style)) as Easing));
+		const ease = (() => {
+			if (transition.ease) return transition.ease;
+			if (easingFunction) {
+				warn(
+					"`easingFunction` has been deprecated in favour of `ease`.",
+					"To migrate, simply replace `easingFunction` with `ease`.",
+				);
+				return easingFunction;
+			}
+			if (easingStyle !== undefined || easingDirection !== undefined)
+				warn(
+					"`easingStyle` and `easingDirection` have been deprecated in favour of `ease`.",
+					"To migrate, visit the migration guide: https://firere.github.io/motion/blog/migration-v2#easingstyle-and-easingdirection",
+				);
+
+			let style = castToName(easingStyle ?? "Linear");
+			if (style === "Linear") return "linear";
+			else if (style === "Circular" || style === "Exponential") style = style.sub(1, 4);
+			const direction = castToName(easingDirection ?? "InOut");
+			const easing = "ease" + direction + style;
+			if (!(easing in easings)) error("Motion internal error: easing incorrectly constructed: " + easing);
+			return easing as Easing;
+		})();
 
 		if (typeIs(ease, "string")) {
 			const [bezier, native] = easings[ease];
