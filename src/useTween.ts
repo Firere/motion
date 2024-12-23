@@ -13,7 +13,7 @@ const castToName = (item: EnumItem | string) => (typeIs(item, "string") ? item :
 function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 	const tweens: { tween: Tween | CustomTween<T>; callback?: Callback }[] = targets.map((target) => {
 		const transition = { ...defaultTransition, ...target.transition };
-		const { duration, easingStyle, easingDirection, easingFunction, reverses, delay, callback } = transition;
+		const { duration, reverses, delay, precision, callback } = transition;
 		const repeatCount = transition.repeat ?? transition.repeatCount ?? 0;
 
 		const properties = { ...target, transition: undefined };
@@ -35,6 +35,8 @@ function tween<T extends Instance>(instance: T, targets: Target<T>[]) {
 
 		const ease = (() => {
 			if (transition.ease) return transition.ease;
+
+			const { easingDirection, easingFunction, easingStyle } = transition;
 			if (easingFunction) {
 				warn(
 					"`easingFunction` has been deprecated in favour of `ease`.",
