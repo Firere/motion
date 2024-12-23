@@ -8,7 +8,7 @@ The first and likely last major update to Motion is here, and with it some previ
 
 <!-- truncate -->
 
-## New `ease` Property
+## Define Easings with `ease`
 
 The properties `easingStyle`, `easingDirection` and `easingFunction` have all been deprecated in favour of the simpler, shorter and more versatile `ease`. Rest assured, no functionality has been lost with this change. 2.0.0 remains backwards compatible with these, however they will be removed in a later version.
 
