@@ -4,19 +4,17 @@ title: Migrating from v1 to v2
 authors: [firere]
 ---
 
-The first and likely last major update to Motion is here, and with it some previous code has been deprecated. Only one minor change could potentially be breaking, but for the vast majority of users all of their code should remain functional. Still, it's a good idea to migrate your code to use recommended features.
+The first and likely last major update to Motion is here, and with it some previous code has been deprecated. Only one minor change could potentially be breaking, but for the vast majority of users all code should remain functional. Still, it's a good idea to migrate your code to use recommended features.
 
 <!-- truncate -->
 
-Let's start with likely the most commonly used legacy syntax:
-
 ## New `ease` Property
 
-The properties `easingStyle`, `easingDirection` and `easingFunction` have all been deprecated in favour of the simpler, shorter and more versatile `ease`, which is able to achieve the same effects as the previous properties did. All previous code will [(for the most part)](#easingfunction) continue to work as it did previously, however these properties may eventually be removed in a later version.
+The properties `easingStyle`, `easingDirection` and `easingFunction` have all been deprecated in favour of the simpler, shorter and more versatile `ease`. Rest assured, no functionality has been lost with this change. 2.0.0 remains backwards compatible with these, however they will be removed in a later version.
 
 ### `easingStyle` and `easingDirection`
 
-If you want to convert `easingStyle` and `easingDirection` (i.e., regular, native Roblox tweens) into an `easing`, you pass in `"ease" + easingDirection + easingStyle`.
+If you want to convert `easingStyle` and `easingDirection` (i.e., regular, native Roblox tweens) into an `ease`, you pass in `"ease" + easingDirection + easingStyle`.
 
 ```ts
 const transition: Transition = {
@@ -28,9 +26,15 @@ const transition: Transition = {
 }
 ```
 
-Because Roblox implements all easings found on [easings.net](https://easings.net/), you can simply head there for a list of all valid easings.
+:::note
 
-Roblox also implements `Enum.EasingStyle.Linear`, and the above method does not work for transition data which uses `Linear`. Because the transition is identical regardless of `easingDirection`, these `transition`s can simply be rewritten as:
+The above will **not** work for `Enum.EasingStyle.Circular` and `Enum.EasingStyle.Exponential`. For these, you must shorten them to `Circ` and `Expo` respectively.
+
+:::
+
+Because Roblox implements all easings found on [easings.net](https://easings.net/), you can head there for a list of all valid easings.
+
+Roblox also implements `Enum.EasingStyle.Linear`, and the above method does not work for transitions which use `Linear`. Because the tween is identical regardless of `easingDirection`, these transitions can simply be rewritten as:
 
 ```ts
 const transition: Transition = {
@@ -42,7 +46,7 @@ Additionally, v2 adds support for passing `ease`, `easeIn`, `easeInOut` and `eas
 
 ### `easingFunction`
 
-These are the simplest to migrate: simply replace `easingFunction` with `ease`.
+These are the easiest to migrate: simply replace `easingFunction` with `ease`.
 
 ```ts
 const transition: Transition = {
@@ -52,12 +56,6 @@ const transition: Transition = {
   ease: [0, 0.3, 0.7, 1],
 }
 ```
-
-:::note
-
-In v2, Motion treats these slightly differently, in that if it can find an equivalent native Roblox tween for a given Bézier function it will resort to that one instead. For example, if you pass `[0.22, 1, 0.36, 1]`, Motion will automatically convert this to a native tween with an easing style of `Quint` and easing direction of `Out`. If it cannot find a native equivalent, then it will play a custom Bézier tween, because native tweens are still more performant.
-
-:::
 
 ## `useAnimation` -> `useTween`
 
